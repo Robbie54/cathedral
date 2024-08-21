@@ -1,8 +1,8 @@
-#include "Headers/matrix_utility.h"
+
 #include "Headers/global.h"
-
+#include "Headers/mcts.h"
 #include <SFML/Graphics.hpp>
-
+#include "Headers/matrix_utility.h"
 
 
 
@@ -43,7 +43,7 @@ std::vector<std::vector<int>> removeBoardFromMatrix(const std::vector<std::vecto
     std::vector<std::vector<int>> matrixTemp = matrix;
     for(int i = 0; i < matrixTemp.size(); i++){
         for(int j = 0; j < matrixTemp[i].size(); j++){
-            if((j >= minX && j < maxX+1 && i >= minY && i < maxY+1)){
+            if((j >= minCol && j < maxCol+1 && i >= minRow && i < maxRow+1)){
                 matrixTemp[i][j] = 9;
             } 
         }
@@ -57,9 +57,9 @@ std::vector<std::vector<int>> removeBoardFromMatrix(const std::vector<std::vecto
 //no border
 std::vector<std::vector<int>> getBoardFromMatrix( std::vector<std::vector<int>> matrix){
     std::vector<std::vector<int>> board(BOARD_SIZE, std::vector<int>(BOARD_SIZE, 0));
-    for (int i = minY; i <= maxY; ++i) {
-        for (int j = minX; j <= maxX; ++j) {
-            board[i - minY][j - minX] = matrix[i][j]; 
+    for (int i = minRow; i <= maxRow; ++i) {
+        for (int j = minCol; j <= maxCol; ++j) {
+            board[i - minRow][j - minCol] = matrix[i][j]; 
 
         }
     }
@@ -72,9 +72,9 @@ std::vector<std::vector<int>> getBoardFromMatrix(const std::vector<std::vector<i
     std::vector<std::vector<int>> board(BOARD_SIZE + border*2, std::vector<int>(BOARD_SIZE + border*2, 4)); // Initialize with 1 extra border around
 
 
-    for (int i = minY; i <= maxY; ++i) {
-        for (int j = minX; j <= maxX; ++j) {
-            board[i - minY + border][j - minX + border] = matrix[i][j]; // Offset by 1 to accommodate the border
+    for (int i = minRow; i <= maxRow; ++i) {
+        for (int j = minCol; j <= maxCol; ++j) {
+            board[i - minRow + border][j - minCol + border] = matrix[i][j]; // Offset by 1 to accommodate the border
 
         }
     }
@@ -98,8 +98,10 @@ std::vector<std::vector<int>> getBoardFromMatrix(const std::vector<std::vector<i
 }
 
 
-
-void addCathedral(std::vector<std::vector<int>>& matrix) {
+/**
+ * todo check can place 
+ */
+Cathedral_move addCathedral(std::vector<std::vector<int>>& matrix) {
     std::vector<std::vector<int>> shape = {{0, cathedral, 0}, {cathedral, cathedral, cathedral}, {0, cathedral, 0}, {0,cathedral,0}};
     // Seed the random number generator with current time
     std::srand(static_cast<unsigned int>(std::time(0)));
@@ -118,32 +120,28 @@ void addCathedral(std::vector<std::vector<int>>& matrix) {
     int shapeCols = shape[0].size();
 
     // Define bounds based on if statement conditions
-    int minY = matrixRows/ 2 - BOARD_SIZE/2;
-    int maxY = matrixRows / 2 + BOARD_SIZE/2 -1;
-    int minX = matrixCols / 2 - BOARD_SIZE/2;
-    int maxX = matrixCols / 2 + BOARD_SIZE/2 -1;
+    int minRow = matrixRows/ 2 - BOARD_SIZE/2;
+    int maxRow = matrixRows / 2 + BOARD_SIZE/2 -1;
+    int minCol = matrixCols / 2 - BOARD_SIZE/2;
+    int maxCol = matrixCols / 2 + BOARD_SIZE/2 -1;
 
     // Calculate maximum allowable starting positions
-    int maxStartRow = maxY - shapeRows + 1;
-    int maxStartCol = maxX - shapeCols + 1;
+    int maxStartRow = maxRow - shapeRows + 1;
+    int maxStartCol = maxCol - shapeCols + 1;
 
     // Generate random position within bounds
     int startRow, startCol;
     do {
-        startRow = std::rand() % maxStartRow + minY;
-        startCol = std::rand() % maxStartCol + minX;
-    } while (startRow < minY || startRow + shapeRows > maxY || startCol < minX || startCol + shapeCols > maxX);
+        startRow = std::rand() % maxStartRow + minRow;
+        startCol = std::rand() % maxStartCol + minCol;
+    } while (startRow < minRow || startRow + shapeRows > maxRow || startCol < minCol || startCol + shapeCols > maxCol);
 
-    // Overlay the shape onto the large matrix
-    for (int i = 0; i < shapeRows; ++i) {
-        for (int j = 0; j < shapeCols; ++j) {
-            // Only add non-zero values from the shape
-            if (shape[i][j] != 0) {
-                matrix[startRow + i][startCol + j] = shape[i][j];
-            }
-        }
-    }
+
+    Cathedral_move m(startRow, startCol, shape); 
+    return m;
 }
 
 
+
+//
 

@@ -27,7 +27,7 @@ class board_utility{
     bool checkNotOpponentsTeritory(std::vector<std::vector<int>> matrix, const sf::Vector2f& mousePosWorld);
     
     //to remove one piece
-    bool checkIfCreatingTerritory(std::vector<std::vector<int>>& map, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld);
+    bool checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld);
 
     private:
         std::vector<std::vector<int>> _board;

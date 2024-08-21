@@ -20,13 +20,21 @@ private:
 
 };
 
+struct CathedralStateInfo {
+    std::vector<std::vector<int>> board;
+    int winner;
+    int turn;
+    std::vector<std::vector<std::vector<int>>> player1Shapes;
+    std::vector<std::vector<std::vector<int>>> player2Shapes;
+};
+
+
 struct Cathedral_move : public MCTS_move {
     int row,col; //top left 
     std::vector<std::vector<int>> shape; //single piece map 
-    int shapeIndex;
 
-    Cathedral_move(int r, int c, std::vector<std::vector<int>> s, int shapeIndex)
-        : row(r), col(c), shape(s), shapeIndex(shapeIndex) {}
+    Cathedral_move(int r, int c, std::vector<std::vector<int>> s)
+        : row(r), col(c), shape(s) {}
 
     bool operator==(const MCTS_move& other) const override { 
         const Cathedral_move &o = (const Cathedral_move &) other;        // Note: Casting necessary
@@ -42,8 +50,6 @@ private:
     std::vector<std::vector<std::vector<int>>> player2Shapes;
 
 
-    void addShapeToBoard(const Cathedral_move *move);
-    void change_turn();
     bool canPlaceShapeAtPos(const vector<vector<int>>& shape, int startRow, int startCol) const;
     Cathedral_move *pick_semirandom_move(Cathedral_state &s) const;
 
@@ -60,14 +66,26 @@ public:
     double rollout() const override;                        // the rollout simulation in MCTS
     bool is_terminal() const override; 
     void print() const override; 
-    bool player1_turn() const override {return true;}
+    bool player1_turn() const override {return turn == 1;} //return true if 1 
 
     //0 is no one 1 and 2 is player //calculated each time state is constructed 
     int check_winner() const;
 
     bool play_move(const Cathedral_move *move);
 
-   
+     CathedralStateInfo get_state_info() const {
+        return { board, winner, turn, player1Shapes, player2Shapes };
+    }
+
+    vector<vector<int>> updatePieces(int player);
+
+    
+    int containsInt(const std::vector<std::vector<std::vector<int>>>& vec, int target);
+    void addShapeToBoard(const Cathedral_move *move);
+    int change_turn();
+
+
+
 
 
 };

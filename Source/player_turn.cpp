@@ -5,56 +5,82 @@
 #include "Headers/draw_board.h"
 #include "Headers/board_utility.h"
 #include "Headers/matrix_utility.h"
-
+#include "Headers/mcts.h"
 
 #include <iostream>
 #include <cmath>
 #include <queue>
 
-std::vector<std::vector<int>>& player_turn::turn(sf::RenderWindow& window, sf::Event event, std::vector<std::vector<int>>& pieceMap, int player, int turnCounter) {
-    _player = player;
-    if(player == 1){
-        _playerMin = player1Min;
-        _playerMax = player1Max; 
+Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state) {
+    //function to add to state are //get a playerShape
+    //check collision
+    //check not opponent territory 
+    //check if creating territory //these could be seperate class maybe?
+    
+    //using mcts move instead of of single piecemap etc 
+
+    std::vector<std::vector<int>> singlePieceMap;
+    vector<std::vector<std::vector<int>>> playersShapes; 
+    
+    _player = state->get_state_info().turn;
+
+    if(_player == 1){
+         playersShapes = state->get_state_info().player1Shapes;
+        // _playerMin = player1Min;
+        // _playerMax = player1Max; 
 
         
     } 
     else{
-        _playerMin = player2Min;
-        _playerMax = player2Max; 
+        playersShapes = state->get_state_info().player2Shapes;
+
+        // _playerMin = player2Min;
+        // _playerMax = player2Max; 
     }
-    
+
+    int pieceNum = 0;
+  
+
+
+    std::string inputString;
+    bool selectingPiece = true;
     bool turnComplete = false;
 
     while(!turnComplete) {
-        bool decisionMade = false;
-        std::vector<std::vector<int>> singlePieceMap;
-        int pieceNum;
 
-        while (!decisionMade) {
+        while(selectingPiece == true){
             while (window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
                     window.close();
-                    return pieceMap;
+                    return *state; // Exit early if the window is closed
                 }
-
-                if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                    sf::Vector2i mousePosWindow = sf::Mouse::getPosition(window);
-                    sf::Vector2f mousePosWorld = window.mapPixelToCoords(mousePosWindow);
-
-                    if (pieceMap[std::floor(mousePosWorld.y / 16)][std::floor(mousePosWorld.x / 16)] >= _playerMin && 
-                        pieceMap[std::floor(mousePosWorld.y / 16)][std::floor(mousePosWorld.x / 16)] <= _playerMax) {
-                        // Find the shape based on the piece selected
-                        pieceNum = pieceMap[std::floor(mousePosWorld.y / 16)][std::floor(mousePosWorld.x / 16)];
-                        singlePieceMap = findShape(pieceMap, std::floor(mousePosWorld.y / 16), std::floor(mousePosWorld.x / 16));
-                        
-                        decisionMade = true;
-                        break;
+                
+                if (event.type == sf::Event::TextEntered) {
+                    if (event.text.unicode < 128) { // Check for printable characters
+                        char enteredChar = static_cast<char>(event.text.unicode);
+                        if (enteredChar == '\b') { // Handle backspace
+                            if (!inputString.empty()) {
+                                inputString.pop_back();
+                            }
+                        } else if (enteredChar == '\r') { // Handle enter
+                            try {
+                                pieceNum = std::stoi(inputString); // Convert to integer
+                                std::cout << "Entered number: " << pieceNum << std::endl;
+                                
+                                selectingPiece = false;
+                            } catch (const std::invalid_argument&) {
+                                std::cerr << "Invalid input. Not a number." << std::endl;
+                            }
+                            inputString.clear(); // Clear input after processing
+                        } else if (isdigit(enteredChar)) { // Only accept digits
+                            inputString += enteredChar;
+                        }
                     }
                 }
             }
-
         }
+
+        singlePieceMap = playersShapes[pieceNum];
 
         bool validPlacement = false;
         while (!validPlacement) {
@@ -64,45 +90,40 @@ std::vector<std::vector<int>>& player_turn::turn(sf::RenderWindow& window, sf::E
 
             sf::Sprite sprite;
             sf::Texture texture;
-            texture.loadFromFile("/home/robbie/Desktop/Capstone/cathedral/Source/Images/misc.png");
+            texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
 
             sprite.setTexture(texture);
             window.clear();
-            drawBoard(window);
-            drawPieces(window, pieceMap);
+            drawBackground(window);
+            drawPieces(window, state);
+            drawBoard(window, state);
+
+
             movePiecesTogether(window, sprite, mousePosWorld, singlePieceMap);
             window.display();
 
-            
+
             while (window.pollEvent(event)) {
                 // Check for close event to exit the game loop
                 if (event.type == sf::Event::Closed) {
                     window.close();
-                    return pieceMap;
+                    // return pieceMap;
                 }
 
-                
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
-                    for (const auto& pos : positions) {
-                        pieceMap[pos.first][pos.second] = pieceNum;
-                    }
-                     window.clear();
-                    drawBoard(window);
-                    drawPieces(window, pieceMap);
+                    window.clear();
+                    drawBackground(window);
+                    drawBoard(window,state);
+                    drawPieces(window, state);
                     window.display();
 
-                    decisionMade = false;
+                    selectingPiece = true;
                     validPlacement = true; 
                     break;
 
-                    
-                    
-                }
+                } 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-                    for (const auto& pos : positions) {
-                        pieceMap[pos.first][pos.second] = pieceNum;
-                    }
-                    decisionMade = true;
+                    state->change_turn();
                     validPlacement = true; 
                     turnComplete = true;
                     break;
@@ -111,71 +132,74 @@ std::vector<std::vector<int>>& player_turn::turn(sf::RenderWindow& window, sf::E
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
                     singlePieceMap = rotateMatrix(singlePieceMap); // Rotate shape
                     movePiecesTogether(window, sprite, mousePosWorld, singlePieceMap);
-
                 }
-
                 if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
                     sf::Vector2i mousePosWindow = sf::Mouse::getPosition(window);
                     sf::Vector2f mousePosWorld = window.mapPixelToCoords(mousePosWindow);
 
                     // Check if the placement is valid
-                    bool noCollision = checkCollision(pieceMap, singlePieceMap, mousePosWorld);
-                    if(noCollision){
-                        board_utility board2(player, getBoardFromMatrix(pieceMap)); 
-                        validPlacement = board2.checkNotOpponentsTeritory(getBoardFromMatrix(pieceMap), mousePosWorld);
+                    vector<vector<int>> board = state->get_state_info().board;
+                    bool noCollision = checkCollision(board, singlePieceMap, mousePosWorld);
+                        if(noCollision){
+                            board_utility board2(_player, board); 
+                            validPlacement = board2.checkNotOpponentsTeritory(board, mousePosWorld);
+                            
 
-                    // validPlacement = true;
-                    if (validPlacement) {
-
-                        addShapeToMatrix(pieceMap, singlePieceMap, mousePosWorld);
                         
-                        if(turnCounter > 1){
-                            board_utility board2(player, getBoardFromMatrix(pieceMap)); 
-                            bool remove = board2.checkIfCreatingTerritory(pieceMap, singlePieceMap, mousePosWorld);
+                        if (validPlacement) {
+                            auto [gridCol, gridRow] = convertMousePosToGridCoords(singlePieceMap, mousePosWorld);
+                            int turn = state->get_state_info().turn;
+
+                            state->play_move(new Cathedral_move(gridRow - minRow, gridCol - minCol, singlePieceMap));
+                            board = state->get_state_info().board;
+                            static bool ignoreOnFirstTurn = false; //so we dont check if creating on first turn 
+                            
+                            if(ignoreOnFirstTurn){
+                                
+                                board_utility board2(_player, board); 
+                                bool remove = board2.checkIfCreatingTerritory(board, singlePieceMap, mousePosWorld); 
+                                //retunrrs the positions to remove 
+                                //
+                                
+                            }
+                            ignoreOnFirstTurn = true;;
+                        
+                            turnComplete = true;
                         }
-                       
-                        turnComplete = true;
-                    }
                     
                     }
                 }
             }
-
-            
         }
     }
-    return pieceMap;
-    
+
+    return *state;
 }
+    
 
 
 
 
-
-bool player_turn::checkCollision(std::vector<std::vector<int>>& pieceMap, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
+bool player_turn::checkCollision(std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
     auto [gridX, gridY] = convertMousePosToGridCoords(shape, mousePosWorld);
 
     // Iterate over the shape matrix
     for (int i = 0; i < shape.size(); ++i) {
         for (int j = 0; j < shape[0].size(); ++j) {
-            // Ensure the shape stays within the pieceMap boundaries
-            if (gridY + i < pieceMap.size() && gridX + j < pieceMap[0].size()) {
-                if (shape[i][j] != 0) {
-                    // Check for collision with existing pieces
-                    if (pieceMap[gridY + i][gridX + j] > 0) {
-                        std::cout << "COLLISION please try again :) " << std::endl;
-                        return false;
-                    }
-
-                    // Check if the piece is out of the board boundaries
-                    if (gridY + i < SCREEN_HEIGHT / 2 - BOARD_SIZE / 2 ||
-                        gridY + i >= SCREEN_HEIGHT / 2 + BOARD_SIZE / 2 ||
-                        gridX + j < SCREEN_WIDTH / 2 - BOARD_SIZE / 2 ||
-                        gridX + j >= SCREEN_WIDTH / 2 + BOARD_SIZE / 2) {
-                        std::cout << "Out of grid :( " << std::endl;
-                        return false;
-                    }
+            if (shape[i][j] != 0) {
+                if (gridY + i < minRow ||
+                    gridY + i > maxRow ||
+                    gridX + j < minCol ||
+                    gridX + j > maxCol) {
+                    std::cout << "Out of grid :( " << std::endl;
+                    return false;
                 }
+
+                if (board[gridY + i-minRow][gridX + j-minCol] > 0) {
+                    std::cout << "COLLISION please try again :) " << std::endl;
+                    return false;
+                }
+                    
             }
         }
     }
@@ -209,7 +233,7 @@ void player_turn::movePiecesTogether(sf::RenderWindow& window, sf::Sprite& sprit
     // Find the first square in the shape
     for (int i = 0; i < singlePieceMap.size(); ++i) {
         for (int j = 0; j < singlePieceMap[i].size(); ++j) {
-            if (singlePieceMap[i][j] >= _playerMin && singlePieceMap[i][j] <= _playerMax) {
+            if (singlePieceMap[i][j] != 0) {
                 firstSquareX = j;
                 firstSquareY = i;
                 break;
@@ -220,10 +244,9 @@ void player_turn::movePiecesTogether(sf::RenderWindow& window, sf::Sprite& sprit
         }
     }
 
-    // Clear the window and draw the pieces
     for (int i = 0; i < singlePieceMap.size(); ++i) {
         for (int j = 0; j < singlePieceMap[i].size(); ++j) {
-            if (singlePieceMap[i][j] >= _playerMin && singlePieceMap[i][j] <= _playerMax) {
+            if (singlePieceMap[i][j] != 0) {
                 float offsetX = (j - firstSquareX) * GRID_SIZE -8 ;
                 float offsetY = (i - firstSquareY) * GRID_SIZE - 8;
                 sprite.setPosition(mousePosWorld.x + offsetX, mousePosWorld.y + offsetY);
@@ -232,7 +255,8 @@ void player_turn::movePiecesTogether(sf::RenderWindow& window, sf::Sprite& sprit
             }
         }
     }
-    window.display();
+
+    // window.display();
 }
 
 
@@ -251,7 +275,7 @@ std::vector<std::vector<int>> player_turn::findShape(std::vector<std::vector<int
         return {}; 
     }
 
-    int minX = startX, maxX = startX, minY = startY, maxY = startY;
+    int minCol = startX, maxCol = startX, minRow = startY, maxRow = startY;
 
     std::queue<std::pair<int, int>> q;
     q.push({startX, startY});
@@ -271,10 +295,10 @@ std::vector<std::vector<int>> player_turn::findShape(std::vector<std::vector<int
         positions.push_back({x, y});
 
         // Update the bounds of the component
-        minX = std::min(minX, x);
-        maxX = std::max(maxX, x);
-        minY = std::min(minY, y);
-        maxY = std::max(maxY, y);
+        minCol = std::min(minCol, x);
+        maxCol = std::max(maxCol, x);
+        minRow = std::min(minRow, y);
+        maxRow = std::max(maxRow, y);
 
         // Check all 4 directions
         for (const auto& dir : directions) {
@@ -289,9 +313,9 @@ std::vector<std::vector<int>> player_turn::findShape(std::vector<std::vector<int
     }
     int pieceNum = matrix[startX][startY];
     // Create the result matrix within the bounding rectangle and delete from old position 
-    std::vector<std::vector<int>> result(maxX - minX + 1, std::vector<int>(maxY - minY + 1, 0));
+    std::vector<std::vector<int>> result(maxCol - minCol + 1, std::vector<int>(maxRow - minRow + 1, 0));
     for (const auto& pos : positions) {
-        result[pos.first - minX][pos.second - minY] = pieceNum;
+        result[pos.first - minCol][pos.second - minRow] = pieceNum;
         matrix[pos.first][pos.second] = 0;
     }
 

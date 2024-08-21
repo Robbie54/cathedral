@@ -1,8 +1,10 @@
 #pragma once
+#include "mcts.h"
 
 
 
-void drawBoard(sf::RenderWindow& window);
-void drawPieces(sf::RenderWindow& window, std::vector<std::vector<int>>& pieceMap);
+void drawBackground(sf::RenderWindow& window);
+void drawBoard(sf::RenderWindow& window, Cathedral_state* state);
+void drawPieces(sf::RenderWindow& window, Cathedral_state* state);
 
 

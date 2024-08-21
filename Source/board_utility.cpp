@@ -17,32 +17,22 @@
 using namespace std;
 
 
-bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& map, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
+bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
     bool valid;
-    
 
-    _board = getBoardFromMatrix(map);
-
-    vector<pair<int,int>> positionsToCheck = positionsAroundShape(shape);
- 
+    vector<pair<int,int>> positionsToCheck = positionsAroundShape(shape); //not sure which is X or Y 
    
-    int gridX = (mousePosWorld.x / GRID_SIZE) - minX;
-    int gridY = (mousePosWorld.y / GRID_SIZE) - minY;
-    //checking positoins around shape it seems accurate  //there is a few overlap shouldn't matter just slower
-    // for (auto pos : positionsToCheck){
-    //     int boardX = gridX + pos.second;
-    //     int boardY = gridY + pos.first;
-    //      map[boardY+minY][boardX + minX] = cathedral; 
-
-    // }
+    int gridCol = (mousePosWorld.x / GRID_SIZE) - minCol;
+    int gridRow = (mousePosWorld.y / GRID_SIZE) - minRow;
+    cout << "Checking at " << gridCol << " " << gridRow << endl;
     for (auto pos : positionsToCheck){
-        int boardX = gridX + pos.second;
-        int boardY = gridY + pos.first;
+        int boardCol = gridCol + pos.second; //X
+        int boardRow = gridRow + pos.first; //Y
         
-        if(boardX < 0 || boardX >= _board[0].size() || boardY < 0 || boardY >= _board.size()){
+        if(boardCol < 0 || boardCol >= _board[0].size() || boardRow < 0 || boardRow >= _board.size()){
             continue; 
         }
-        if(_board[boardY][boardX] >= _playerMin && _board[boardY][boardX] <= _playerMax){
+        if(_board[boardCol][boardRow] >= _playerMin && _board[boardCol][boardRow] <= _playerMax){
             continue; 
         }
 
@@ -50,21 +40,20 @@ bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& map,
         int pieceInside = INT_MAX; //max when no piece inside       
         piecePosToRemove.clear();
         pieceNum = 0;
-        bool r = checkPositionForPieceRemoval(boardX, boardY, visited, pieceInside); 
+        bool r = checkPositionForPieceRemoval(boardCol, boardRow, visited, pieceInside); 
         if(r == true){ 
             if(piecePosToRemove.empty()){
                 cout << "EMPTY " << endl;
                 return false;
             }
-            pieceNum = map[piecePosToRemove[0].first + minY][piecePosToRemove[0].second + minX];
+            pieceNum = board[piecePosToRemove[0].first][piecePosToRemove[0].second];
             for(auto pos : piecePosToRemove ){
-                // cout << "piece to remove " <<  pos.first << " " << pos.second << endl;
-                map[pos.first + minY][pos.second + minX] = 0; 
+                cout << "piece to remove " <<  pos.first << " " << pos.second << endl;
+                board[pos.first][pos.second] = 0; 
             }
-            addShapeBack(map);
+            // addShapeBack(map);
+            cout << "not adding back " << endl;
         }
-        
-        
 
     }
 
@@ -163,8 +152,10 @@ bool board_utility::checkPositionForPieceRemoval(int x, int y, std::vector<std::
         if (pieceInside == INT_MAX || _board[y][x] == pieceInside ) {
             pieceInside = _board[y][x];
             piecePosToRemove.push_back(std::make_pair(y, x));
+            cout << "pushing back y(row)  " << y << " x(col) " << x << endl;
         }
         else {
+            cout <<"returning false " << piecePosToRemove.size() << " pieceInside " << pieceInside << " _board[y][x] " << _board[y][x] << endl;
             return false; 
         }
 
@@ -178,7 +169,7 @@ bool board_utility::checkPositionForPieceRemoval(int x, int y, std::vector<std::
 
         // Check all adjacent cells (including diagonals)
         bool valid = true;
-       valid &= checkPositionForPieceRemoval(x + 1, y, visited, pieceInside); // Right
+        valid &= checkPositionForPieceRemoval(x + 1, y, visited, pieceInside); // Right
         if (!valid) return false;
         valid &= checkPositionForPieceRemoval(x - 1, y, visited, pieceInside); // Left
         if (!valid) return false;
@@ -212,8 +203,8 @@ bool board_utility::checkNotOpponentsTeritory(std::vector<std::vector<int>> boar
     bool valid = true;
     _board = board; 
 
-    int gridX = mousePosWorld.x / GRID_SIZE - minX; 
-    int gridY = mousePosWorld.y / GRID_SIZE - minY;
+    int gridX = mousePosWorld.x / GRID_SIZE - minCol; 
+    int gridY = mousePosWorld.y / GRID_SIZE - minRow;
     
     std::vector<std::vector<bool>> visited(rows, std::vector<bool>(cols, false));     
     valid = checkPosition(gridX, gridY, visited);
