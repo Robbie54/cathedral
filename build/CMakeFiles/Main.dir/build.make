@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/bin/cmake -E rm -f
+RM = /usr/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/robbie/Desktop/Capstone/cathedral
+CMAKE_SOURCE_DIR = /home/robbie/Desktop/capstone/cathedral
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/robbie/Desktop/Capstone/cathedral/build
+CMAKE_BINARY_DIR = /home/robbie/Desktop/capstone/cathedral/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Main.dir/depend.make
@@ -72,114 +72,114 @@ include CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/Source/main.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/Source/main.cpp.o: ../Source/main.cpp
 CMakeFiles/Main.dir/Source/main.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Main.dir/Source/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/main.cpp.o -MF CMakeFiles/Main.dir/Source/main.cpp.o.d -o CMakeFiles/Main.dir/Source/main.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/Source/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Main.dir/Source/main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/main.cpp.o -MF CMakeFiles/Main.dir/Source/main.cpp.o.d -o CMakeFiles/Main.dir/Source/main.cpp.o -c /home/robbie/Desktop/capstone/cathedral/Source/main.cpp
 
 CMakeFiles/Main.dir/Source/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/Source/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/Source/main.cpp > CMakeFiles/Main.dir/Source/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/Source/main.cpp > CMakeFiles/Main.dir/Source/main.cpp.i
 
 CMakeFiles/Main.dir/Source/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/Source/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/Source/main.cpp -o CMakeFiles/Main.dir/Source/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/Source/main.cpp -o CMakeFiles/Main.dir/Source/main.cpp.s
 
 CMakeFiles/Main.dir/Source/draw_board.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/Source/draw_board.cpp.o: ../Source/draw_board.cpp
 CMakeFiles/Main.dir/Source/draw_board.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Main.dir/Source/draw_board.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/draw_board.cpp.o -MF CMakeFiles/Main.dir/Source/draw_board.cpp.o.d -o CMakeFiles/Main.dir/Source/draw_board.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/Source/draw_board.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Main.dir/Source/draw_board.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/draw_board.cpp.o -MF CMakeFiles/Main.dir/Source/draw_board.cpp.o.d -o CMakeFiles/Main.dir/Source/draw_board.cpp.o -c /home/robbie/Desktop/capstone/cathedral/Source/draw_board.cpp
 
 CMakeFiles/Main.dir/Source/draw_board.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/Source/draw_board.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/Source/draw_board.cpp > CMakeFiles/Main.dir/Source/draw_board.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/Source/draw_board.cpp > CMakeFiles/Main.dir/Source/draw_board.cpp.i
 
 CMakeFiles/Main.dir/Source/draw_board.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/Source/draw_board.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/Source/draw_board.cpp -o CMakeFiles/Main.dir/Source/draw_board.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/Source/draw_board.cpp -o CMakeFiles/Main.dir/Source/draw_board.cpp.s
 
 CMakeFiles/Main.dir/Source/board_utility.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/Source/board_utility.cpp.o: ../Source/board_utility.cpp
 CMakeFiles/Main.dir/Source/board_utility.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Main.dir/Source/board_utility.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/board_utility.cpp.o -MF CMakeFiles/Main.dir/Source/board_utility.cpp.o.d -o CMakeFiles/Main.dir/Source/board_utility.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/Source/board_utility.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Main.dir/Source/board_utility.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/board_utility.cpp.o -MF CMakeFiles/Main.dir/Source/board_utility.cpp.o.d -o CMakeFiles/Main.dir/Source/board_utility.cpp.o -c /home/robbie/Desktop/capstone/cathedral/Source/board_utility.cpp
 
 CMakeFiles/Main.dir/Source/board_utility.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/Source/board_utility.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/Source/board_utility.cpp > CMakeFiles/Main.dir/Source/board_utility.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/Source/board_utility.cpp > CMakeFiles/Main.dir/Source/board_utility.cpp.i
 
 CMakeFiles/Main.dir/Source/board_utility.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/Source/board_utility.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/Source/board_utility.cpp -o CMakeFiles/Main.dir/Source/board_utility.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/Source/board_utility.cpp -o CMakeFiles/Main.dir/Source/board_utility.cpp.s
 
 CMakeFiles/Main.dir/Source/player_turn.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/Source/player_turn.cpp.o: ../Source/player_turn.cpp
 CMakeFiles/Main.dir/Source/player_turn.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Main.dir/Source/player_turn.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/player_turn.cpp.o -MF CMakeFiles/Main.dir/Source/player_turn.cpp.o.d -o CMakeFiles/Main.dir/Source/player_turn.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/Source/player_turn.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Main.dir/Source/player_turn.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/player_turn.cpp.o -MF CMakeFiles/Main.dir/Source/player_turn.cpp.o.d -o CMakeFiles/Main.dir/Source/player_turn.cpp.o -c /home/robbie/Desktop/capstone/cathedral/Source/player_turn.cpp
 
 CMakeFiles/Main.dir/Source/player_turn.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/Source/player_turn.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/Source/player_turn.cpp > CMakeFiles/Main.dir/Source/player_turn.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/Source/player_turn.cpp > CMakeFiles/Main.dir/Source/player_turn.cpp.i
 
 CMakeFiles/Main.dir/Source/player_turn.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/Source/player_turn.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/Source/player_turn.cpp -o CMakeFiles/Main.dir/Source/player_turn.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/Source/player_turn.cpp -o CMakeFiles/Main.dir/Source/player_turn.cpp.s
 
 CMakeFiles/Main.dir/Source/mcts.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/Source/mcts.cpp.o: ../Source/mcts.cpp
 CMakeFiles/Main.dir/Source/mcts.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Main.dir/Source/mcts.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/mcts.cpp.o -MF CMakeFiles/Main.dir/Source/mcts.cpp.o.d -o CMakeFiles/Main.dir/Source/mcts.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/Source/mcts.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Main.dir/Source/mcts.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/mcts.cpp.o -MF CMakeFiles/Main.dir/Source/mcts.cpp.o.d -o CMakeFiles/Main.dir/Source/mcts.cpp.o -c /home/robbie/Desktop/capstone/cathedral/Source/mcts.cpp
 
 CMakeFiles/Main.dir/Source/mcts.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/Source/mcts.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/Source/mcts.cpp > CMakeFiles/Main.dir/Source/mcts.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/Source/mcts.cpp > CMakeFiles/Main.dir/Source/mcts.cpp.i
 
 CMakeFiles/Main.dir/Source/mcts.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/Source/mcts.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/Source/mcts.cpp -o CMakeFiles/Main.dir/Source/mcts.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/Source/mcts.cpp -o CMakeFiles/Main.dir/Source/mcts.cpp.s
 
 CMakeFiles/Main.dir/Source/matrix_utility.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/Source/matrix_utility.cpp.o: ../Source/matrix_utility.cpp
 CMakeFiles/Main.dir/Source/matrix_utility.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Main.dir/Source/matrix_utility.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/matrix_utility.cpp.o -MF CMakeFiles/Main.dir/Source/matrix_utility.cpp.o.d -o CMakeFiles/Main.dir/Source/matrix_utility.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/Source/matrix_utility.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Main.dir/Source/matrix_utility.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/Source/matrix_utility.cpp.o -MF CMakeFiles/Main.dir/Source/matrix_utility.cpp.o.d -o CMakeFiles/Main.dir/Source/matrix_utility.cpp.o -c /home/robbie/Desktop/capstone/cathedral/Source/matrix_utility.cpp
 
 CMakeFiles/Main.dir/Source/matrix_utility.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/Source/matrix_utility.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/Source/matrix_utility.cpp > CMakeFiles/Main.dir/Source/matrix_utility.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/Source/matrix_utility.cpp > CMakeFiles/Main.dir/Source/matrix_utility.cpp.i
 
 CMakeFiles/Main.dir/Source/matrix_utility.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/Source/matrix_utility.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/Source/matrix_utility.cpp -o CMakeFiles/Main.dir/Source/matrix_utility.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/Source/matrix_utility.cpp -o CMakeFiles/Main.dir/Source/matrix_utility.cpp.s
 
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o: ../MonteCarloTreeSearch-main/mcts/src/mcts.cpp
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o -MF CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o.d -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/mcts.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o -MF CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o.d -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o -c /home/robbie/Desktop/capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/mcts.cpp
 
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/mcts.cpp > CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/mcts.cpp > CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.i
 
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/mcts.cpp -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/mcts.cpp -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.s
 
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o: CMakeFiles/Main.dir/flags.make
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o: ../MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o: CMakeFiles/Main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o -MF CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o.d -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o -c /home/robbie/Desktop/Capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o -MF CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o.d -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o -c /home/robbie/Desktop/capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp
 
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/Capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp > CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robbie/Desktop/capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp > CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.i
 
 CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/Capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robbie/Desktop/capstone/cathedral/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp -o CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.s
 
 # Object files for target Main
 Main_OBJECTS = \
@@ -195,24 +195,24 @@ Main_OBJECTS = \
 # External object files for target Main
 Main_EXTERNAL_OBJECTS =
 
-Main: CMakeFiles/Main.dir/Source/main.cpp.o
-Main: CMakeFiles/Main.dir/Source/draw_board.cpp.o
-Main: CMakeFiles/Main.dir/Source/board_utility.cpp.o
-Main: CMakeFiles/Main.dir/Source/player_turn.cpp.o
-Main: CMakeFiles/Main.dir/Source/mcts.cpp.o
-Main: CMakeFiles/Main.dir/Source/matrix_utility.cpp.o
-Main: CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o
-Main: CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o
-Main: CMakeFiles/Main.dir/build.make
-Main: /usr/lib/x86_64-linux-gnu/libsfml-graphics.so.2.5.1
-Main: /usr/lib/x86_64-linux-gnu/libsfml-window.so.2.5.1
-Main: /usr/lib/x86_64-linux-gnu/libsfml-system.so.2.5.1
-Main: CMakeFiles/Main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable Main"
+bin/Main: CMakeFiles/Main.dir/Source/main.cpp.o
+bin/Main: CMakeFiles/Main.dir/Source/draw_board.cpp.o
+bin/Main: CMakeFiles/Main.dir/Source/board_utility.cpp.o
+bin/Main: CMakeFiles/Main.dir/Source/player_turn.cpp.o
+bin/Main: CMakeFiles/Main.dir/Source/mcts.cpp.o
+bin/Main: CMakeFiles/Main.dir/Source/matrix_utility.cpp.o
+bin/Main: CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/mcts.cpp.o
+bin/Main: CMakeFiles/Main.dir/MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp.o
+bin/Main: CMakeFiles/Main.dir/build.make
+bin/Main: /usr/lib/x86_64-linux-gnu/libsfml-graphics.so.2.5.1
+bin/Main: /usr/lib/x86_64-linux-gnu/libsfml-window.so.2.5.1
+bin/Main: /usr/lib/x86_64-linux-gnu/libsfml-system.so.2.5.1
+bin/Main: CMakeFiles/Main.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/robbie/Desktop/capstone/cathedral/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable bin/Main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/Main.dir/build: Main
+CMakeFiles/Main.dir/build: bin/Main
 .PHONY : CMakeFiles/Main.dir/build
 
 CMakeFiles/Main.dir/clean:
@@ -220,6 +220,6 @@ CMakeFiles/Main.dir/clean:
 .PHONY : CMakeFiles/Main.dir/clean
 
 CMakeFiles/Main.dir/depend:
-	cd /home/robbie/Desktop/Capstone/cathedral/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/robbie/Desktop/Capstone/cathedral /home/robbie/Desktop/Capstone/cathedral /home/robbie/Desktop/Capstone/cathedral/build /home/robbie/Desktop/Capstone/cathedral/build /home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles/Main.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/robbie/Desktop/capstone/cathedral/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/robbie/Desktop/capstone/cathedral /home/robbie/Desktop/capstone/cathedral /home/robbie/Desktop/capstone/cathedral/build /home/robbie/Desktop/capstone/cathedral/build /home/robbie/Desktop/capstone/cathedral/build/CMakeFiles/Main.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Main.dir/depend
 

@@ -16,6 +16,13 @@ add_executable(Main Source/main.cpp Source/draw_board.cpp Source/board_utility.c
 
 target_link_libraries(Main sfml-graphics sfml-window sfml-system pthread)
 
+
+set_target_properties(Main PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+

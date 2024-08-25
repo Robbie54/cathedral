@@ -30,15 +30,15 @@ int main(){
     //mcts setup 
     Cathedral_state *state = new Cathedral_state();
     
-    MCTS_tree *game_tree = new MCTS_tree(new Cathedral_state());    // Important: do not use the same state that we change in main loop
-    
-    //add cathedral //using play_move();
-    //
+
     vector<vector<int>> blankBoard(10, std::vector<int>(10, 0));
 
     const Cathedral_move m = addCathedral(blankBoard);
     
     state->addShapeToBoard(&m);
+
+    MCTS_tree *game_tree = new MCTS_tree(new Cathedral_state(*state));    // Important: do not use the same state that we change in main loop 
+                                                                        //im creating a copy here i think 
 
     while(window.isOpen()){
         while (window.pollEvent(event)){
@@ -60,12 +60,14 @@ int main(){
                         cin.ignore(512, '\n');
                         cout << "Game has already finished." << endl << endl;
                     } else {
-                        double max_seconds = 10; //thinking time
+                        double max_seconds = 1; //thinking time
                         double max_iterations = 2000;
                         game_tree->grow_tree(max_iterations, max_seconds);
                         game_tree->print_stats(); 
                         
+                        
                         MCTS_node *best_child = game_tree->select_best_child();
+
                         if (best_child == NULL) {
                             cerr << "Warning: Could not find best child. Tree has no children? Possible terminal node" << endl << endl;
                         }

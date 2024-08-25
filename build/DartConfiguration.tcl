@@ -4,8 +4,8 @@
 
 
 # Configuration directories and files
-SourceDirectory: /home/robbie/Desktop/Capstone/cathedral
-BuildDirectory: /home/robbie/Desktop/Capstone/cathedral/build
+SourceDirectory: /home/robbie/Desktop/capstone/cathedral
+BuildDirectory: /home/robbie/Desktop/capstone/cathedral/build
 
 # Where to place the cost data store
 CostDataFile: 
@@ -26,8 +26,8 @@ SubmitURL: http://
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/usr/local/bin/cmake" "/home/robbie/Desktop/Capstone/cathedral"
-MakeCommand: /usr/local/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
+ConfigureCommand: "/usr/bin/cmake" "/home/robbie/Desktop/capstone/cathedral"
+MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 
 # version control
@@ -44,7 +44,7 @@ SVNOptions:
 SVNUpdateOptions: 
 
 # Git options
-GITCommand: 
+GITCommand: /usr/bin/git
 GITInitSubmodules: 
 GITUpdateOptions: 
 GITUpdateCustom: 
@@ -57,13 +57,13 @@ P4UpdateOptions:
 P4UpdateCustom: 
 
 # Generic update command
-UpdateCommand: 
+UpdateCommand: /usr/bin/git
 UpdateOptions: 
-UpdateType: 
+UpdateType: git
 
 # Compiler info
 Compiler: /usr/bin/c++
-CompilerVersion: 9.4.0
+CompilerVersion: 11.4.0
 
 # Dynamic analysis (MemCheck)
 PurifyCommand: 

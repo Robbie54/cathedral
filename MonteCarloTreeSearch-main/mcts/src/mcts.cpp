@@ -236,6 +236,7 @@ void MCTS_node::print_stats() const {
             return n1->calculate_winrate(true) > n2->calculate_winrate(true);
         });
     } else {
+        
         std::sort(children->begin(), children->end(), [](const MCTS_node *n1, const MCTS_node *n2){
             return n1->calculate_winrate(false) > n2->calculate_winrate(false);
         });
@@ -245,6 +246,9 @@ void MCTS_node::print_stats() const {
     for (int i = 0 ; i < children->size() && i < TOPK ; i++) {
         cout << "  " << i + 1 << ". " << children->at(i)->move->sprint() << "  -->  "
              << setprecision(4) << 100.0 * children->at(i)->calculate_winrate(state->player1_turn()) << "%" << endl;
+        
+        // children->at(i)->get_current_state()->print(); //print board of best moves 
+                
     }
     cout << "________________________________" << endl;
 }

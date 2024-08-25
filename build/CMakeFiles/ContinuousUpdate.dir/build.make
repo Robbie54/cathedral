@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/bin/cmake -E rm -f
+RM = /usr/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/robbie/Desktop/Capstone/cathedral
+CMAKE_SOURCE_DIR = /home/robbie/Desktop/capstone/cathedral
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/robbie/Desktop/Capstone/cathedral/build
+CMAKE_BINARY_DIR = /home/robbie/Desktop/capstone/cathedral/build
 
 # Utility rule file for ContinuousUpdate.
 
@@ -67,7 +67,7 @@ include CMakeFiles/ContinuousUpdate.dir/compiler_depend.make
 include CMakeFiles/ContinuousUpdate.dir/progress.make
 
 CMakeFiles/ContinuousUpdate:
-	/usr/local/bin/ctest -D ContinuousUpdate
+	/usr/bin/ctest -D ContinuousUpdate
 
 ContinuousUpdate: CMakeFiles/ContinuousUpdate
 ContinuousUpdate: CMakeFiles/ContinuousUpdate.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/ContinuousUpdate.dir/clean:
 .PHONY : CMakeFiles/ContinuousUpdate.dir/clean
 
 CMakeFiles/ContinuousUpdate.dir/depend:
-	cd /home/robbie/Desktop/Capstone/cathedral/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/robbie/Desktop/Capstone/cathedral /home/robbie/Desktop/Capstone/cathedral /home/robbie/Desktop/Capstone/cathedral/build /home/robbie/Desktop/Capstone/cathedral/build /home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles/ContinuousUpdate.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/robbie/Desktop/capstone/cathedral/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/robbie/Desktop/capstone/cathedral /home/robbie/Desktop/capstone/cathedral /home/robbie/Desktop/capstone/cathedral/build /home/robbie/Desktop/capstone/cathedral/build /home/robbie/Desktop/capstone/cathedral/build/CMakeFiles/ContinuousUpdate.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ContinuousUpdate.dir/depend
 

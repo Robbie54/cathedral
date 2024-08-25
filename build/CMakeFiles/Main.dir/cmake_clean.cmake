@@ -15,8 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Main.dir/Source/mcts.cpp.o.d"
   "CMakeFiles/Main.dir/Source/player_turn.cpp.o"
   "CMakeFiles/Main.dir/Source/player_turn.cpp.o.d"
-  "Main"
-  "Main.pdb"
+  "bin/Main"
+  "bin/Main.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

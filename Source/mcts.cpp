@@ -209,14 +209,14 @@ queue<MCTS_move *> *Cathedral_state::actions_to_try() const{
     }
     // cout << "actions to try " << shapes->size() << " "  << endl;
 
-    
-    for(int i = 0; i < shapes->size(); i++){
+    //starts with big pieces first
+    for(int i = shapes->size()-1; i >= 0; i--){
         const auto& shape = (*shapes)[i]; //dereference to access  
         for(int k = 0; k<4; k++){
             for(int x = 0; x < board.size()-shape.size(); x++){
                 for(int y = 0; y < board[x].size()-shape.size(); y++){
                     // cout << board[x].size() << " " <<  shape.size() << " " <<  board[x].size()-shape.size() << endl; //printing this 18446708949467004946
-                    if(canPlaceShapeAtPos(shape,x,y)){
+                    if(canPlaceShapeAtPos(shape,x,y)){ //!TODO && not in territory 
                         Q->push(new Cathedral_move(x,y,shape));
                     }
 
@@ -229,6 +229,7 @@ queue<MCTS_move *> *Cathedral_state::actions_to_try() const{
     if(Q->empty()){
         // cout << "No actions to try"<< endl;
     }
+    cout << "Actions to try size " << Q->size() << endl;
     return Q;
 }
 
@@ -248,6 +249,12 @@ bool Cathedral_state::canPlaceShapeAtPos(const vector<vector<int>>& shape, int s
 }
 
 void Cathedral_state::print() const{
+    for (const auto& row : board) {
+        for (const auto& elem : row) {
+            std::cout << elem << " ";
+        }
+        std::cout << std::endl;
+    }
     cout << "Print function ";
 }
 
@@ -427,48 +434,38 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
     // 
     const std::vector<std::vector<std::vector<int>>>* shapes;
 
-    if (turn == 1) {
-        if (s.player1Shapes.empty()){
-            cout << "noPlayer1Shapes" << endl; 
-            return nullptr;
-        }
+    // if (turn == 1) {
+    //     if (s.player1Shapes.empty()){
+    //         cout << "noPlayer1Shapes" << endl; 
+    //         return nullptr;
+    //     }
 
-        shapes = &s.player1Shapes;
+    //     shapes = &s.player1Shapes;
 
-    } else if (turn == 2) {
-        if (s.player2Shapes.empty()){
-             cout << "noPlayer2Shapes" << endl; 
-             return nullptr;
-        }
+    // } else if (turn == 2) {
+    //     if (s.player2Shapes.empty()){
+    //          cout << "noPlayer2Shapes" << endl; 
+    //          return nullptr;
+    //     }
 
-        shapes = &s.player2Shapes;
+    //     shapes = &s.player2Shapes;
 
-    } else {
-        cout << "Invalid turn number!" << std::endl;
-        return nullptr;
-    }
-        
-    for(int i = 0; i < shapes->size(); i++){
-        // cout << shapes->size() << " sshapes size " <<endl; 
-        const auto& shape = (*shapes)[i]; //dereference to access  
-        // for(int k = 0; k<4; k++){
-            for(int x = 0; x < s.board.size()-shape.size(); x++){
-                for(int y = 0; y < s.board[x].size()-shape[0].size(); y++){
-                    if(s.canPlaceShapeAtPos(shape,x,y)){
-                        
-                        // cout << "Semi Random move picked " << x << " " << y << " " << "turn " << turn << " " << "" << i << endl;
-                        // printMatrix(shape);
-                        return new Cathedral_move(x,y,shape);
-                    }
+    // } else {
+    //     cout << "Invalid turn number!" << std::endl;
+    //     return nullptr;
+    // }
 
-                }
-            }
 
-        //     rotateMatrix(shape);
-        // }
+    queue<MCTS_move*> *Q = s.actions_to_try();
+
+    if(!Q->empty()){
+        MCTS_move *m = Q->front();
+        return static_cast<Cathedral_move*>(m);
     }
 
-    cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE seg fault" <<endl;
+
+
+    cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE" <<endl;
 
 }
 

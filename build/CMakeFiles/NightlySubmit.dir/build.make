@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/bin/cmake -E rm -f
+RM = /usr/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/robbie/Desktop/Capstone/cathedral
+CMAKE_SOURCE_DIR = /home/robbie/Desktop/capstone/cathedral
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/robbie/Desktop/Capstone/cathedral/build
+CMAKE_BINARY_DIR = /home/robbie/Desktop/capstone/cathedral/build
 
 # Utility rule file for NightlySubmit.
 
@@ -67,7 +67,7 @@ include CMakeFiles/NightlySubmit.dir/compiler_depend.make
 include CMakeFiles/NightlySubmit.dir/progress.make
 
 CMakeFiles/NightlySubmit:
-	/usr/local/bin/ctest -D NightlySubmit
+	/usr/bin/ctest -D NightlySubmit
 
 NightlySubmit: CMakeFiles/NightlySubmit
 NightlySubmit: CMakeFiles/NightlySubmit.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/NightlySubmit.dir/clean:
 .PHONY : CMakeFiles/NightlySubmit.dir/clean
 
 CMakeFiles/NightlySubmit.dir/depend:
-	cd /home/robbie/Desktop/Capstone/cathedral/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/robbie/Desktop/Capstone/cathedral /home/robbie/Desktop/Capstone/cathedral /home/robbie/Desktop/Capstone/cathedral/build /home/robbie/Desktop/Capstone/cathedral/build /home/robbie/Desktop/Capstone/cathedral/build/CMakeFiles/NightlySubmit.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/robbie/Desktop/capstone/cathedral/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/robbie/Desktop/capstone/cathedral /home/robbie/Desktop/capstone/cathedral /home/robbie/Desktop/capstone/cathedral/build /home/robbie/Desktop/capstone/cathedral/build /home/robbie/Desktop/capstone/cathedral/build/CMakeFiles/NightlySubmit.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/NightlySubmit.dir/depend
 
