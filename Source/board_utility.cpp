@@ -13,18 +13,22 @@
 #include "Headers/matrix_utility.h"
 #include "Headers/player_turn.h"
 
+#include "Headers/mcts.h"
+
+
 
 using namespace std;
 
-
-bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
+bool board_utility::checkIfCreatingTerritoryFirstTurn(std::vector<std::vector<int>>& board, const Cathedral_move *move) {
+    
     bool valid;
-
-    vector<pair<int,int>> positionsToCheck = positionsAroundShape(shape); //not sure which is X or Y 
+    
+    vector<pair<int,int>> positionsToCheck = positionsAroundShape(move->shape); //not sure which is X or Y 
    
-    int gridCol = (mousePosWorld.x / GRID_SIZE) - minCol;
-    int gridRow = (mousePosWorld.y / GRID_SIZE) - minRow;
-    cout << "Checking at " << gridCol << " " << gridRow << endl;
+    int gridCol = move->col;
+    int gridRow = move->row;
+
+    // cout << "Checking at " << gridCol << " " << gridRow << endl;
     for (auto pos : positionsToCheck){
         int boardCol = gridCol + pos.second; //X
         int boardRow = gridRow + pos.first; //Y
@@ -32,7 +36,117 @@ bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& boar
         if(boardCol < 0 || boardCol >= _board[0].size() || boardRow < 0 || boardRow >= _board.size()){
             continue; 
         }
+
         if(_board[boardCol][boardRow] >= _playerMin && _board[boardCol][boardRow] <= _playerMax){
+            continue; 
+        }
+
+        std::vector<std::vector<bool>> visited(rows, std::vector<bool>(cols, false));
+      
+        bool r = checkIfPositionIsTerritory(boardCol, boardRow, visited); 
+        if(r == true){ 
+            // if(piecePosToRemove.empty()){
+            //     cout << "EMPTY " << endl;
+            //     return false;
+            // }
+            // pieceNum = board[piecePosToRemove[0].first][piecePosToRemove[0].second];
+            // for(auto pos : piecePosToRemove ){
+            //     cout << "piece to remove " <<  pos.first << " " << pos.second << endl;
+            //     board[pos.first][pos.second] = 0; 
+            // } 
+            cout << "position is territory in first turn at col: " << boardCol << " row:" << boardRow << " Board index is: " << _board[boardCol][boardRow] << endl;
+            // for(int i = 0; i < visited.size(); i++){ //should be same size as board
+            //     for(int j = 0; j<visited[i].size(); j++){
+            //         if(visited[i][j] == true){
+            //             board[i][j] = cathedral;
+            //         }
+            //     }
+            // }
+            return true;
+            // addShapeBack(map);
+            // cout << "not adding back in first tu " << endl;
+        }
+
+    }
+
+
+   
+    return false;
+}
+
+
+bool board_utility::checkIfPositionIsTerritory(int x, int y, std::vector<std::vector<bool>>& visited){
+    // Check bounds
+    if (y < 0 || y >= rows || x < 0 || x >= cols) {
+        return true; // Reached the edge, valid
+    }
+
+      // If already visited, skip this cell
+    if (visited[y][x]) {
+        return true;
+    }
+
+    // Mark the cell as visited
+    visited[y][x] = true;
+
+    if (_board[y][x] >= _playerMin && _board[y][x] <= _playerMax) {
+        return true;
+    }
+
+
+    if ((_board[y][x] >= _opponentMin && _board[y][x] <= _opponentMax) || _board[y][x] == cathedral) {      
+        return false;
+    }
+   
+
+
+    if (_board[y][x] == 0 || _board[y][x] == cathedral || (_board[y][x] >= _opponentMin && _board[y][x] <= _opponentMax)) {
+  
+        // Check all adjacent cells (including diagonals)
+        bool valid = true;
+        valid &= checkIfPositionIsTerritory(x + 1, y, visited); // Right
+        if (!valid) return false;
+        valid &= checkIfPositionIsTerritory(x - 1, y, visited); // Left
+        if (!valid) return false;
+        valid &= checkIfPositionIsTerritory(x, y + 1, visited); // Down
+        if (!valid) return false;
+        valid &= checkIfPositionIsTerritory(x, y - 1, visited); // Up
+        if (!valid) return false;
+        valid &= checkIfPositionIsTerritory(x + 1, y + 1, visited); // Bottom-Right (Diagonal)
+        if (!valid) return false;
+        valid &= checkIfPositionIsTerritory(x - 1, y - 1, visited); // Top-Left (Diagonal)
+        if (!valid) return false;
+        valid &= checkIfPositionIsTerritory(x + 1, y - 1, visited); // Top-Right (Diagonal)
+        if (!valid) return false;
+        valid &= checkIfPositionIsTerritory(x - 1, y + 1, visited); // Bottom-Left (Diagonal)
+        if (!valid) return false;
+
+
+        return valid;
+    }
+
+    return false;
+}
+
+
+
+bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const Cathedral_move *move) {
+    bool valid;
+    
+    vector<pair<int,int>> positionsToCheck = positionsAroundShape(move->shape); //not sure which is X or Y 
+   
+    int gridCol = move->col;
+    int gridRow = move->row;
+
+    // cout << "Checking at " << gridCol << " " << gridRow << endl;
+    for (auto pos : positionsToCheck){
+        int boardCol = gridCol + pos.second; //X
+        int boardRow = gridRow + pos.first; //Y
+        
+        if(boardCol < 0 || boardCol >= _board[0].size() || boardRow < 0 || boardRow >= _board.size()){
+            continue; 
+        }
+        if(board[boardCol][boardRow] >= _playerMin && board[boardCol][boardRow] <= _playerMax){
             continue; 
         }
 
@@ -43,16 +157,24 @@ bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& boar
         bool r = checkPositionForPieceRemoval(boardCol, boardRow, visited, pieceInside); 
         if(r == true){ 
             if(piecePosToRemove.empty()){
-                cout << "EMPTY " << endl;
+                // cout << "EMPTY " << endl;
                 return false;
             }
             pieceNum = board[piecePosToRemove[0].first][piecePosToRemove[0].second];
             for(auto pos : piecePosToRemove ){
-                cout << "piece to remove " <<  pos.first << " " << pos.second << endl;
+                // cout << "piece to remove " <<  pos.first << " " << pos.second << endl;
                 board[pos.first][pos.second] = 0; 
             }
+
+            // for(int i = 0; i < visited.size(); i++){ //should be same size as board
+            //     for(int j = 0; j<visited[i].size(); j++){
+            //         if(visited[i][j] == true){
+            //             board[i][j] = cathedral;
+            //         }
+            //     }
+            // }
             // addShapeBack(map);
-            cout << "not adding back " << endl;
+            // cout << "not adding back " << endl;
         }
 
     }
@@ -61,6 +183,10 @@ bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& boar
    
     return false;
 }
+
+
+
+
 
 void board_utility::addShapeBack(std::vector<std::vector<int>>& map){
     if(pieceNum == 0 ){
@@ -152,10 +278,10 @@ bool board_utility::checkPositionForPieceRemoval(int x, int y, std::vector<std::
         if (pieceInside == INT_MAX || _board[y][x] == pieceInside ) {
             pieceInside = _board[y][x];
             piecePosToRemove.push_back(std::make_pair(y, x));
-            cout << "pushing back y(row)  " << y << " x(col) " << x << endl;
+            // cout << "pushing back y(row)  " << y << " x(col) " << x << endl;
         }
         else {
-            cout <<"returning false " << piecePosToRemove.size() << " pieceInside " << pieceInside << " _board[y][x] " << _board[y][x] << endl;
+            // cout <<"returning false " << piecePosToRemove.size() << " pieceInside " << pieceInside << " _board[y][x] " << _board[y][x] << endl;
             return false; 
         }
 

@@ -7,18 +7,6 @@
 
 #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
 
-class mcts { 
-
-public: 
-    std::pair<int, int> calculateScore(const std::vector<std::vector<int>>& matrix);
-
-
-
-private:
-    
-
-
-};
 
 struct CathedralStateInfo {
     std::vector<std::vector<int>> board;
@@ -26,6 +14,7 @@ struct CathedralStateInfo {
     int turn;
     std::vector<std::vector<std::vector<int>>> player1Shapes;
     std::vector<std::vector<std::vector<int>>> player2Shapes;
+    
 };
 
 
@@ -48,6 +37,14 @@ private:
     int winner, turn;
     std::vector<std::vector<std::vector<int>>> player1Shapes;
     std::vector<std::vector<std::vector<int>>> player2Shapes;
+    int playerMin, playerMax;
+    int opponentMin, opponentMax;
+    int playerTerritory, opponentTerritory;
+    
+    const vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+
+    int stateRunningEvaluation; 
 
 
     bool canPlaceShapeAtPos(const vector<vector<int>>& shape, int startRow, int startCol) const;
@@ -56,6 +53,18 @@ private:
     bool legal_move(const Cathedral_move *move);
     
     double evaluate_position(Cathedral_state &s) const;
+
+    //these two are first turn
+    bool checkIfCreatingTerritoryFirstTurn(const Cathedral_move *move);
+    bool checkIfPositionIsPlayersTerritory(int x, int y, std::vector<std::vector<bool>>& visited);
+
+    std::vector<std::pair<int, int>> positionsAroundShape(const std::vector<std::vector<int>>& shape);
+    void changeSpaceToPlayersTerritory(int boardCol, int boardRow);
+
+    bool checkIfCreatingTerritory(const Cathedral_move *move);
+
+
+
 
 public:
     Cathedral_state(); 

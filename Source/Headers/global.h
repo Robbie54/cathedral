@@ -22,9 +22,11 @@ constexpr unsigned int maxRow = SCREEN_HEIGHT / 2 + BOARD_SIZE / 2 - 1;
 constexpr unsigned int empty = 0; 
 constexpr unsigned int cathedral = 1; 
 constexpr unsigned int player1Min = 2; 
-constexpr unsigned int player1Max = 25;  //just adding lee way for pieces taken out etc 
+constexpr unsigned int player1Max = 24;  //just adding lee way for pieces taken out etc 
+constexpr unsigned int player1Territory = 25;
 constexpr unsigned int player2Min = 26; 
-constexpr unsigned int player2Max = 50; 
+constexpr unsigned int player2Max = 49; 
+constexpr unsigned int player2Territory = 50;
 
 
 extern std::vector<std::vector<std::vector<int>>> shapeFullList;

@@ -72,6 +72,19 @@ void drawBoard(sf::RenderWindow& window, Cathedral_state* state){
 
               window.draw(sprite);
             }
+            else if(board[i][j] == player1Territory){
+              sprite.setPosition(static_cast<float>(GRID_SIZE * j + minCol * GRID_SIZE), static_cast<float>(GRID_SIZE * i + minRow * GRID_SIZE));
+              sprite.setTextureRect(sf::IntRect(GRID_SIZE, GRID_SIZE, GRID_SIZE, GRID_SIZE));
+
+              window.draw(sprite);
+            }
+            else if(board[i][j] == player2Territory){
+              sprite.setPosition(static_cast<float>(GRID_SIZE * j + minCol * GRID_SIZE), static_cast<float>(GRID_SIZE * i + minRow * GRID_SIZE));
+              sprite.setTextureRect(sf::IntRect(GRID_SIZE*2, GRID_SIZE, GRID_SIZE, GRID_SIZE));
+
+              window.draw(sprite);
+            }
+            
             
 
           }

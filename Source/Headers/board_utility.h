@@ -1,5 +1,6 @@
 #pragma once
-
+// #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
+#include "mcts.h"
 //this class is for calculations that happen on the board 
 //possibly add an update board on map in matrix utility class 
 
@@ -25,9 +26,13 @@ class board_utility{
 
     // checkTeritory
     bool checkNotOpponentsTeritory(std::vector<std::vector<int>> matrix, const sf::Vector2f& mousePosWorld);
+
+    //for first move 
+    bool checkIfCreatingTerritoryFirstTurn(std::vector<std::vector<int>>& board, const Cathedral_move *move);
+
     
     //to remove one piece
-    bool checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld);
+    bool checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const Cathedral_move *move);
 
     private:
         std::vector<std::vector<int>> _board;
@@ -52,8 +57,13 @@ class board_utility{
 
         //check position is not one enemy piece in territory
         bool checkPositionForPieceRemoval(int x, int y, std::vector<std::vector<bool>>& visited, int& pieceInside);
+        
+        //this is for first turn so not deleting cathedral
+        bool checkIfPositionIsTerritory(int x, int y, std::vector<std::vector<bool>>& visited);
+
 
         void addShapeBack(std::vector<std::vector<int>>& map);
+
 
 
         

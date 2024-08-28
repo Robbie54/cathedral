@@ -2,10 +2,13 @@
 #include "Headers/global.h"
 #include "Headers/mcts.h"
 #include "Headers/matrix_utility.h"
+#include "Headers/board_utility.h"
 
 #include <vector>
 #include <iostream>
 #include <utility>
+#include <climits>
+
 
 using namespace std;
 
@@ -59,44 +62,12 @@ std::vector<std::vector<std::vector<int>>> shapeFullListPTwo{
 
 
 
-
-std::pair<int, int> mcts::calculateScore(const std::vector<std::vector<int>>& matrix){
-    int playerOneScore = 0;
-    int playerTwoScore = 0;
-
-    for(int i = 0; i < minCol; i++){
-        for(int j = 0; j < SCREEN_HEIGHT; j++){
-            if(matrix[j][i] >= player1Min && matrix[j][i] <= player1Max){
-                playerOneScore++;
-            }
-        }
-    }
-
-    for(int i = maxCol; i<SCREEN_WIDTH ; i++){
-        for(int j = 0; j < SCREEN_HEIGHT; j++){
-            if(matrix[j][i] >= player2Min && matrix[j][i] <= player2Max){
-                playerTwoScore++;
-            }
-        }
-    }
-
-
-    if(playerOneScore < playerTwoScore){
-        return {1,playerTwoScore-playerOneScore};
-    }
-    else if(playerOneScore > playerTwoScore){
-        return {2,playerOneScore-playerTwoScore};
-    }
-  
-    return {0,0};
-}
-
 //in ttt this is called once before do while in quoridor same only for new game
 //no winner is calcualted 
-Cathedral_state::Cathedral_state() : MCTS_state(), board(10, std::vector<int>(10, 0)), winner(0), turn(1), player1Shapes(shapeFullListPOne), player2Shapes(shapeFullListPTwo) {
+Cathedral_state::Cathedral_state() : MCTS_state(), board(10, std::vector<int>(10, 0)), winner(0), turn(1), player1Shapes(shapeFullListPOne), player2Shapes(shapeFullListPTwo), playerMin(player1Min), playerMax(player1Max), opponentMin(player2Min), opponentMax(player2Max), playerTerritory(player1Territory), opponentTerritory(player2Territory){
 }
 
-Cathedral_state::Cathedral_state(const Cathedral_state &other) : MCTS_state(other), winner(other.winner), board(other.board), turn(other.turn), player1Shapes(other.player1Shapes), player2Shapes(other.player2Shapes){
+Cathedral_state::Cathedral_state(const Cathedral_state &other) : MCTS_state(other), winner(other.winner), board(other.board), turn(other.turn), player1Shapes(other.player1Shapes), player2Shapes(other.player2Shapes), playerMin(other.playerMin), playerMax(other.playerMax), opponentMin(other.opponentMin), opponentMax(other.opponentMax), playerTerritory(other.playerTerritory), opponentTerritory(other.opponentTerritory) {
    
 };
 
@@ -172,6 +143,9 @@ void Cathedral_state::addShapeToBoard(const Cathedral_move *move){
 } 
 
 int Cathedral_state::change_turn() {
+    std::swap(playerMin, opponentMin);
+    std::swap(playerMax, opponentMax);
+    std::swap(playerTerritory, opponentTerritory);
     turn = (turn == 1) ? 2 : 1;
     return turn;
 }
@@ -229,7 +203,7 @@ queue<MCTS_move *> *Cathedral_state::actions_to_try() const{
     if(Q->empty()){
         // cout << "No actions to try"<< endl;
     }
-    cout << "Actions to try size " << Q->size() << endl;
+    // cout << "Actions to try size " << Q->size() << endl;
     return Q;
 }
 
@@ -239,7 +213,7 @@ bool Cathedral_state::canPlaceShapeAtPos(const vector<vector<int>>& shape, int s
             if (shape[i][j] == 0) {
                 continue;
             }
-            if (board[startRow + i][startCol + j] != 0) {
+            if (board[startRow + i][startCol + j] != 0 && board[startRow + i][startCol + j] != playerTerritory) {
                 return false;
             }
         }
@@ -259,7 +233,7 @@ void Cathedral_state::print() const{
 }
 
 double Cathedral_state::rollout() const{
-    #define MAXSTEPS 50
+    #define MAXSTEPS 26 //more then most games atm 
     #define EVALUATION_THRESHOLD 0.8     // when eval is this skewed then don't simulate any more, return eval
 
 
@@ -283,6 +257,7 @@ double Cathedral_state::rollout() const{
         }
 
         noerror = curState.play_move(m);
+        
         if (!noerror) {
             cerr << "Error: in rollouts" << endl;
             delete m;
@@ -339,6 +314,22 @@ bool Cathedral_state::play_move(const Cathedral_move *move){
     else {
         cout << "Error with turn in play move " << endl;
     }
+        // board_utility b(turn, board); 
+        int t = false;  
+        int hi = player1Shapes.size();
+        int two = player2Shapes.size();
+        if(player1Shapes.size() >= 14 || player2Shapes.size() >= 14){
+            // cout << "first  turn move is col: " << move->col << " row :" << move->row << endl;
+           t = checkIfCreatingTerritoryFirstTurn(move);
+        }
+        else {
+            // t = b.checkIfCreatingTerritory(board, move); 
+        }
+
+        if(t == true){
+            cout << "Territory created! " << endl;
+            stateRunningEvaluation = 1.0;
+        }
 
         winner = check_winner();
         change_turn();
@@ -388,23 +379,31 @@ bool Cathedral_state::legal_move(const Cathedral_move *move) {
 }
 
 
+//currently rarely used because usually rollout is terminal before max steps reachs
 double Cathedral_state::evaluate_position(Cathedral_state &s) const {
     int player1RemainingShapes = s.player1Shapes.size();
     int player2RemainingShapes = s.player2Shapes.size();
     int shapeDifference = player1RemainingShapes - player2RemainingShapes;
-
+    if(stateRunningEvaluation > 0){
+        cout << "evaluated position as 1 from getting territory" << endl;
+        return 1;
+    }
     if (shapeDifference > 0) {
         if(shapeDifference <= 1){
             return 0.7;
         }
+        cout << "player 1 is winning " << endl;
         return 1.0;  // Player 1 is winning
     } else if (shapeDifference < 0) {
         if(shapeDifference >= -1){
             return 0.3;
         }
+        cout << "player 2 is winning " << endl;
+
         return 0.0;  // Player 2 is winning
     } else {
         return 0.5;  // Draw
+        cout << "draw " << endl; 
     }
 }
 
@@ -471,20 +470,6 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
 
 
 
-//generate all moves 
-
-//one step 
-//on a blank board any given piece has (64 - 100) positions x 4 rotations
-//14 pieces
-//so absolute upper limit for one step is 100 x 4 x 14 = 5600
-
-
-
-//side note to player mcts combination 
-//have the board in center then the pieces in a vector being printed on the sides so as we play a piece the vector gets popped 
-
-
-
 
 //check if out of area doesn't owrk 
 vector<vector<int>> Cathedral_state::updatePieces(int player) {
@@ -537,3 +522,157 @@ vector<vector<int>> Cathedral_state::updatePieces(int player) {
 
     return resultMatrix;
 }
+
+
+
+bool Cathedral_state::checkIfCreatingTerritoryFirstTurn(const Cathedral_move *move) {
+    
+    bool valid;
+    
+    vector<pair<int,int>> positionsToCheck = positionsAroundShape(move->shape); //not sure which is X or Y 
+
+    // cout << "Checking at " << gridCol << " " << gridRow << endl;
+    for (auto pos : positionsToCheck){
+        int boardCol = move->col + pos.second; //X
+        int boardRow = move->row + pos.first; //Y
+        
+        if(boardCol < 0 || boardCol >= board[0].size() || boardRow < 0 || boardRow >= board.size()){
+            continue; 
+        }
+
+        if(board[boardRow][boardCol] >= playerMin && board[boardRow][boardCol] <= playerMax){
+            continue; 
+        }
+
+        std::vector<std::vector<bool>> visited(board.size(), std::vector<bool>(board[0].size(), false));
+      
+        bool r = checkIfPositionIsPlayersTerritory(boardCol, boardRow, visited); 
+        if(r == true){ 
+        
+            cout << "position is territory in first turn at col: " << boardCol << " row:" << boardRow << " Board index is: " << board[boardRow][boardCol] << endl;
+         
+            changeSpaceToPlayersTerritory(boardCol, boardRow);
+            return true;
+            // addShapeBack(map);
+            // cout << "not adding back in first tu " << endl;
+        }
+
+    }
+
+
+   
+    return false;
+}
+
+//this whole function should be redundnat because territory should be marked now
+bool Cathedral_state::checkIfPositionIsPlayersTerritory(int x, int y, std::vector<std::vector<bool>>& visited){
+    // Check bounds
+    if (y < 0 || y >= board.size() || x < 0 || x >= board[0].size()) { 
+        return true; // Reached the edge, valid
+    }
+
+      // If already visited, skip this cell
+    if (visited[y][x]) { 
+        return true;
+    }
+
+    // Mark the cell as visited
+    visited[y][x] = true;
+
+    if (board[y][x] >= playerMin && board[y][x] <= playerMax || board[y][x] == playerTerritory) {
+        return true;
+    }
+
+
+    if ((board[y][x] >= opponentMin && board[y][x] <= opponentMax) || board[y][x] == cathedral || board[y][x] == opponentTerritory) {      
+        return false;
+    }
+   
+
+
+    if (board[y][x] == 0 || board[y][x] == cathedral || (board[y][x] >= opponentMin && board[y][x] <= opponentMax)) {
+  
+        // Check all adjacent cells (including diagonals)
+        bool valid = true;
+        valid &= checkIfPositionIsPlayersTerritory(x + 1, y, visited); // Right
+        if (!valid) return false;
+        valid &= checkIfPositionIsPlayersTerritory(x - 1, y, visited); // Left
+        if (!valid) return false;
+        valid &= checkIfPositionIsPlayersTerritory(x, y + 1, visited); // Down
+        if (!valid) return false;
+        valid &= checkIfPositionIsPlayersTerritory(x, y - 1, visited); // Up
+        if (!valid) return false;
+        valid &= checkIfPositionIsPlayersTerritory(x + 1, y + 1, visited); // Bottom-Right (Diagonal)
+        if (!valid) return false;
+        valid &= checkIfPositionIsPlayersTerritory(x - 1, y - 1, visited); // Top-Left (Diagonal)
+        if (!valid) return false;
+        valid &= checkIfPositionIsPlayersTerritory(x + 1, y - 1, visited); // Top-Right (Diagonal)
+        if (!valid) return false;
+        valid &= checkIfPositionIsPlayersTerritory(x - 1, y + 1, visited); // Bottom-Left (Diagonal)
+        if (!valid) return false;
+
+
+        return valid;
+    }
+
+    return false;
+}
+
+std::vector<std::pair<int, int>> Cathedral_state::positionsAroundShape(const std::vector<std::vector<int>>& shape) {
+    std::vector<std::pair<int, int>> positions;
+    // Compute positions around the shape
+   for (int i = 0; i < shape.size(); ++i) {
+        for (int j = 0; j < shape[i].size(); ++j) {
+            if (shape[i][j] != 0) {
+                if (i == 0 || shape[i - 1][j] == 0) {
+                    positions.push_back({i - 1, j});
+                }
+                if (i == shape.size() - 1 || shape[i + 1][j] == 0) {
+                    positions.push_back({i + 1, j});
+                }
+                if (j == 0 || shape[i][j - 1] == 0) {
+                    positions.push_back({i, j - 1});
+                }
+                if (j == shape[i].size() - 1 || shape[i][j + 1] == 0) {
+                    positions.push_back({i, j + 1});
+                }
+                
+
+            }
+        }
+    }
+
+    return positions;
+}
+
+
+void Cathedral_state::changeSpaceToPlayersTerritory(int boardCol, int boardRow){
+    
+    // Boundary and condition check
+    if (boardRow < 0 || boardCol < 0 || boardRow >= board.size() || boardCol >= board[0].size() || board[boardRow][boardCol] != 0) {
+        return;
+    }
+    
+   if(turn == 1){
+    board[boardRow][boardCol] = player1Territory;
+   }
+   else if(turn == 2){
+    board[boardRow][boardCol] = player2Territory;
+   }
+   else { 
+        cout << "turn broken trying to change space to territory? " << endl;
+   }
+    
+
+    
+    // Recursively call for all adjacent positions
+    for (const auto& dir : directions) {
+        int newRow = boardRow + dir.first;
+        int newCol = boardCol + dir.second;
+        changeSpaceToPlayersTerritory(newCol, newRow);
+    }
+    
+}
+
+
+

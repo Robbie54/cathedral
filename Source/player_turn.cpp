@@ -138,36 +138,40 @@ Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cat
                     sf::Vector2f mousePosWorld = window.mapPixelToCoords(mousePosWindow);
 
                     // Check if the placement is valid
-                    vector<vector<int>> board = state->get_state_info().board;
-                    bool noCollision = checkCollision(board, singlePieceMap, mousePosWorld);
-                        if(noCollision){
-                            board_utility board2(_player, board); 
-                            validPlacement = board2.checkNotOpponentsTeritory(board, mousePosWorld);
-                            
-
-                        
-                        if (validPlacement) {
-                            auto [gridCol, gridRow] = convertMousePosToGridCoords(singlePieceMap, mousePosWorld);
-                            int turn = state->get_state_info().turn;
-
-                            state->play_move(new Cathedral_move(gridRow - minRow, gridCol - minCol, singlePieceMap));
-                            board = state->get_state_info().board;
-                            static bool ignoreOnFirstTurn = false; //so we dont check if creating on first turn 
-                            
-                            if(ignoreOnFirstTurn){
+                    static bool ignoreOnFirstTurn = false; //so we dont check if creating on first turn 
+                    
+                        vector<vector<int>> board = state->get_state_info().board;
+                        bool noCollision = checkCollision(board, singlePieceMap, mousePosWorld);
+                            if(noCollision){
+                                    board_utility board2(_player, board); 
+                                    validPlacement = board2.checkNotOpponentsTeritory(board, mousePosWorld);
                                 
-                                board_utility board2(_player, board); 
-                                bool remove = board2.checkIfCreatingTerritory(board, singlePieceMap, mousePosWorld); 
-                                //retunrrs the positions to remove 
-                                //
+                         
+
+                            
+                            if (validPlacement) {
+                                auto [gridCol, gridRow] = convertMousePosToGridCoords(singlePieceMap, mousePosWorld);
+                                int turn = state->get_state_info().turn;
+                                Cathedral_move move(gridRow - minRow, gridCol - minCol, singlePieceMap);
+                                state->play_move(&move);
+                                // board = state->get_state_info().board;
                                 
+                            
+                                // if(ignoreOnFirstTurn){
+
+                                //     board_utility board2(_player, board); 
+                                //     bool remove = board2.checkIfCreatingTerritory(board, &move); 
+                                //     //retunrrs the positions to remove 
+                                //     //
+                                // }
+                                
+                                // ignoreOnFirstTurn = true;;
+                            
+                                turnComplete = true;
                             }
-                            ignoreOnFirstTurn = true;;
                         
-                            turnComplete = true;
                         }
                     
-                    }
                 }
             }
         }
