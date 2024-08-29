@@ -100,7 +100,15 @@ int Cathedral_state::check_winner() const {
             return 3; //tie
         }
     }
-    
+
+    //   Clean up dynamically allocated MCTS_move* objects in the queue  //this helped significantly with memeory i think actions to try is causing the main memory leaks 
+    while (!Q->empty()) {
+        MCTS_move* move = Q->front();
+        Q->pop();
+        delete move;
+    }
+
+    delete Q;
     return 0;
 }
 
@@ -348,8 +356,12 @@ int Cathedral_state::containsInt(const std::vector<std::vector<std::vector<int>>
 
 
 bool Cathedral_state::legal_move(const Cathedral_move *move) const{
-    if (move == NULL) return false;
-    if(move->row > board.size() || move->row < 0 || move->col > board[0].size() || move->col < 0){
+    if (move == NULL) {
+        cout <<"NULL Move in legal Move " << endl; 
+        return false;
+    }
+
+    if(move->row >= board.size() || move->row < 0 || move->col >= board[0].size() || move->col < 0){
         cout << "Not legal move row or coloumn out of range proberly undefined " << endl;
         return false;
     }
@@ -414,20 +426,27 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
 
             int randomNumber = dis(gen);
             for (int i = 0; i <= randomNumber; ++i) {
-                m = Q->front();
+                m = static_cast<Cathedral_move*>(Q->front());
                 Q->pop();
             }
         }
         else{
-            std::uniform_int_distribution<> dis(1, Q->size());
+            std::uniform_int_distribution<> dis(1, Q->size()-1);
             int randomNumber = dis(gen);
 
             for (int i = 0; i <= randomNumber; ++i) {
-                m = Q->front();
+                m = static_cast<Cathedral_move*>(Q->front());
                 Q->pop();
             }
 
         }
+        while (!Q->empty()) {
+        MCTS_move* m = Q->front();
+        Q->pop();
+        delete m;  // Clean up individual elements
+        }
+        delete Q;  // Clean up the queue itself
+
         return static_cast<Cathedral_move*>(m);
     }
 
@@ -444,8 +463,7 @@ Cathedral_move *Cathedral_state::pickRandomMove(Cathedral_state &s) const {
 
     MCTS_move *m;
     if(!Q->empty()){
-  
-        std::uniform_int_distribution<> dis(1, Q->size());
+        std::uniform_int_distribution<> dis(1, Q->size()-1);
         int randomNumber = dis(gen);
 
         for (int i = 0; i <= randomNumber; ++i) {
@@ -453,11 +471,19 @@ Cathedral_move *Cathedral_state::pickRandomMove(Cathedral_state &s) const {
             Q->pop();
         }
 
-        
+        while (!Q->empty()) {
+            MCTS_move* m = Q->front();
+            Q->pop();
+            delete m;  
+        }
+        delete Q;  
+
         return static_cast<Cathedral_move*>(m);
     }
 
+    delete Q; 
     cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE" <<endl;
+    
 
 }
 
@@ -550,7 +576,7 @@ bool Cathedral_state::checkIfCreatingTerritory(const Cathedral_move *move) {
             // cout << "position is territory at col: " << boardCol << " row:" << boardRow << " Board index is: " << board[boardRow][boardCol] << endl;
          
             changeSpaceToPlayersTerritory(boardRow, boardCol);
-            if(pieceNumToRemove != -1){
+            if(pieceNumToRemove != -1 && pieceNumToRemove != 1){
                 addShapeToPlayerShapes(pieceNumToRemove);
             }
             

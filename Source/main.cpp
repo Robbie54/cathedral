@@ -60,7 +60,7 @@ int main(){
                         cin.ignore(512, '\n');
                         cout << "Game has already finished." << endl << endl;
                     } else {
-                        double max_seconds = 1; //thinking time
+                        double max_seconds = 20; //thinking time
                         double max_iterations = 2000;
                         game_tree->grow_tree(max_iterations, max_seconds);
                         game_tree->print_stats(); 
