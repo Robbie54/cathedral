@@ -3,7 +3,7 @@
 #include "Headers/player_turn.h"
 #include "Headers/global.h"
 #include "Headers/draw_board.h"
-#include "Headers/board_utility.h"
+// #include "Headers/board_utility.h"
 #include "Headers/matrix_utility.h"
 #include "Headers/mcts.h"
 
@@ -65,9 +65,14 @@ Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cat
                         } else if (enteredChar == '\r') { // Handle enter
                             try {
                                 pieceNum = std::stoi(inputString); // Convert to integer
-                                std::cout << "Entered number: " << pieceNum << std::endl;
+                                if(pieceNum >= playersShapes.size()){
+                                    cout << "Input to large try again. (" << pieceNum << ") Valid size: " << playersShapes.size()-1 << endl;
+                                }
+                                else {
+                                    std::cout << "Entered number: " << pieceNum << std::endl;
+                                    selectingPiece = false;
+                                }
                                 
-                                selectingPiece = false;
                             } catch (const std::invalid_argument&) {
                                 std::cerr << "Invalid input. Not a number." << std::endl;
                             }
@@ -107,7 +112,6 @@ Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cat
                 // Check for close event to exit the game loop
                 if (event.type == sf::Event::Closed) {
                     window.close();
-                    // return pieceMap;
                 }
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
@@ -141,34 +145,17 @@ Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cat
                     static bool ignoreOnFirstTurn = false; //so we dont check if creating on first turn 
                     
                         vector<vector<int>> board = state->get_state_info().board;
-                        bool noCollision = checkCollision(board, singlePieceMap, mousePosWorld);
+
+                        auto [gridCol, gridRow] = convertMousePosToGridCoords(singlePieceMap, mousePosWorld);
+                        Cathedral_move move(gridRow - minRow, gridCol - minCol, singlePieceMap);
+
+                        bool noCollision = state->legal_move(&move); //also should checks territory 
+
                             if(noCollision){
-                                    board_utility board2(_player, board); 
-                                    validPlacement = board2.checkNotOpponentsTeritory(board, mousePosWorld);
-                                
-                         
-
-                            
-                            if (validPlacement) {
-                                auto [gridCol, gridRow] = convertMousePosToGridCoords(singlePieceMap, mousePosWorld);
-                                int turn = state->get_state_info().turn;
-                                Cathedral_move move(gridRow - minRow, gridCol - minCol, singlePieceMap);
                                 state->play_move(&move);
-                                // board = state->get_state_info().board;
-                                
-                            
-                                // if(ignoreOnFirstTurn){
-
-                                //     board_utility board2(_player, board); 
-                                //     bool remove = board2.checkIfCreatingTerritory(board, &move); 
-                                //     //retunrrs the positions to remove 
-                                //     //
-                                // }
-                                
-                                // ignoreOnFirstTurn = true;;
-                            
+                                validPlacement = true;
                                 turnComplete = true;
-                            }
+                            
                         
                         }
                     
@@ -182,52 +169,24 @@ Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cat
     
 
 
+//might be useless
 
+// void player_turn::addShapeToMatrix(std::vector<std::vector<int>>& pieceMap, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
+//     auto [gridX, gridY] = convertMousePosToGridCoords(shape, mousePosWorld);
 
-bool player_turn::checkCollision(std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
-    auto [gridX, gridY] = convertMousePosToGridCoords(shape, mousePosWorld);
-
-    // Iterate over the shape matrix
-    for (int i = 0; i < shape.size(); ++i) {
-        for (int j = 0; j < shape[0].size(); ++j) {
-            if (shape[i][j] != 0) {
-                if (gridY + i < minRow ||
-                    gridY + i > maxRow ||
-                    gridX + j < minCol ||
-                    gridX + j > maxCol) {
-                    std::cout << "Out of grid :( " << std::endl;
-                    return false;
-                }
-
-                if (board[gridY + i-minRow][gridX + j-minCol] > 0) {
-                    std::cout << "COLLISION please try again :) " << std::endl;
-                    return false;
-                }
-                    
-            }
-        }
-    }
-    return true;
-}
-
-
-
-void player_turn::addShapeToMatrix(std::vector<std::vector<int>>& pieceMap, const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
-    auto [gridX, gridY] = convertMousePosToGridCoords(shape, mousePosWorld);
-
-    // Iterate over the shape matrix and add it to the pieceMap
-    for (int i = 0; i < shape.size(); ++i) {
-        for (int j = 0; j < shape[0].size(); ++j) {
-            // Ensure the shape stays within the pieceMap boundaries
-            if (gridY + i < pieceMap.size() && gridX + j < pieceMap[0].size()) {
-                // Only add non-zero values from the shape
-                if (shape[i][j] >= _playerMin && shape[i][j] <= _playerMax) {
-                    pieceMap[gridY + i][gridX + j] = shape[i][j];
-                }
-            }
-        }
-    }
-}
+//     // Iterate over the shape matrix and add it to the pieceMap
+//     for (int i = 0; i < shape.size(); ++i) {
+//         for (int j = 0; j < shape[0].size(); ++j) {
+//             // Ensure the shape stays within the pieceMap boundaries
+//             if (gridY + i < pieceMap.size() && gridX + j < pieceMap[0].size()) {
+//                 // Only add non-zero values from the shape
+//                 if (shape[i][j] >= _playerMin && shape[i][j] <= _playerMax) {
+//                     pieceMap[gridY + i][gridX + j] = shape[i][j];
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
@@ -269,62 +228,62 @@ void player_turn::movePiecesTogether(sf::RenderWindow& window, sf::Sprite& sprit
 
 
 // Function to check if a cell is within the grid and is of players numder
-bool player_turn::isValid(const std::vector<std::vector<int>>& matrix, int x, int y) {
-    return x >= 0 && x < matrix.size() && y >= 0 && y < matrix[0].size() && matrix[x][y] >= _playerMin && matrix[x][y] <= _playerMax;
-}
+// bool player_turn::isValid(const std::vector<std::vector<int>>& matrix, int x, int y) {
+//     return x >= 0 && x < matrix.size() && y >= 0 && y < matrix[0].size() && matrix[x][y] >= _playerMin && matrix[x][y] <= _playerMax;
+// }
 
-std::vector<std::vector<int>> player_turn::findShape(std::vector<std::vector<int>>& matrix, int startX, int startY) {
-    positions.clear();
-    if (!isValid(matrix, startX, startY)) {
-        return {}; 
-    }
+// std::vector<std::vector<int>> player_turn::findShape(std::vector<std::vector<int>>& matrix, int startX, int startY) {
+//     positions.clear();
+//     if (!isValid(matrix, startX, startY)) {
+//         return {}; 
+//     }
 
-    int minCol = startX, maxCol = startX, minRow = startY, maxRow = startY;
+//     int minCol = startX, maxCol = startX, minRow = startY, maxRow = startY;
 
-    std::queue<std::pair<int, int>> q;
-    q.push({startX, startY});
+//     std::queue<std::pair<int, int>> q;
+//     q.push({startX, startY});
 
-    // To track visited cells
-    std::vector<std::vector<bool>> visited(matrix.size(), std::vector<bool>(matrix[0].size(), false));
-    visited[startX][startY] = true;
+//     // To track visited cells
+//     std::vector<std::vector<bool>> visited(matrix.size(), std::vector<bool>(matrix[0].size(), false));
+//     visited[startX][startY] = true;
 
     
 
-    while (!q.empty()) {
-        std::pair<int, int> front = q.front();
-        int x = front.first;
-        int y = front.second;
-        q.pop();
+//     while (!q.empty()) {
+//         std::pair<int, int> front = q.front();
+//         int x = front.first;
+//         int y = front.second;
+//         q.pop();
 
-        positions.push_back({x, y});
+//         positions.push_back({x, y});
 
-        // Update the bounds of the component
-        minCol = std::min(minCol, x);
-        maxCol = std::max(maxCol, x);
-        minRow = std::min(minRow, y);
-        maxRow = std::max(maxRow, y);
+//         // Update the bounds of the component
+//         minCol = std::min(minCol, x);
+//         maxCol = std::max(maxCol, x);
+//         minRow = std::min(minRow, y);
+//         maxRow = std::max(maxRow, y);
 
-        // Check all 4 directions
-        for (const auto& dir : directions) {
-            int newX = x + dir.first;
-            int newY = y + dir.second;
+//         // Check all 4 directions
+//         for (const auto& dir : directions) {
+//             int newX = x + dir.first;
+//             int newY = y + dir.second;
 
-            if (isValid(matrix, newX, newY) && !visited[newX][newY]) {
-                visited[newX][newY] = true;
-                q.push({newX, newY});
-            }
-        }
-    }
-    int pieceNum = matrix[startX][startY];
-    // Create the result matrix within the bounding rectangle and delete from old position 
-    std::vector<std::vector<int>> result(maxCol - minCol + 1, std::vector<int>(maxRow - minRow + 1, 0));
-    for (const auto& pos : positions) {
-        result[pos.first - minCol][pos.second - minRow] = pieceNum;
-        matrix[pos.first][pos.second] = 0;
-    }
+//             if (isValid(matrix, newX, newY) && !visited[newX][newY]) {
+//                 visited[newX][newY] = true;
+//                 q.push({newX, newY});
+//             }
+//         }
+//     }
+//     int pieceNum = matrix[startX][startY];
+//     // Create the result matrix within the bounding rectangle and delete from old position 
+//     std::vector<std::vector<int>> result(maxCol - minCol + 1, std::vector<int>(maxRow - minRow + 1, 0));
+//     for (const auto& pos : positions) {
+//         result[pos.first - minCol][pos.second - minRow] = pieceNum;
+//         matrix[pos.first][pos.second] = 0;
+//     }
 
-    return result;
-}
+//     return result;
+// }
 
 
 

@@ -42,26 +42,29 @@ private:
     int playerTerritory, opponentTerritory;
     
     const vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    bool firstTurn;
+    int pieceNumToRemove;
 
 
-    int stateRunningEvaluation; 
-
-
-    bool canPlaceShapeAtPos(const vector<vector<int>>& shape, int startRow, int startCol) const;
     Cathedral_move *pick_semirandom_move(Cathedral_state &s) const;
 
-    bool legal_move(const Cathedral_move *move);
     
     double evaluate_position(Cathedral_state &s) const;
 
-    //these two are first turn
-    bool checkIfCreatingTerritoryFirstTurn(const Cathedral_move *move);
-    bool checkIfPositionIsPlayersTerritory(int x, int y, std::vector<std::vector<bool>>& visited);
+    Cathedral_move *pickRandomMove(Cathedral_state &s) const;
+
+
+    //Territory stuff
+    bool checkIfCreatingTerritory(const Cathedral_move *move);
+    bool checkIfPositionIsNowPlayersTerritory(int row, int col, std::vector<std::vector<bool>>& visited);
 
     std::vector<std::pair<int, int>> positionsAroundShape(const std::vector<std::vector<int>>& shape);
-    void changeSpaceToPlayersTerritory(int boardCol, int boardRow);
+    void changeSpaceToPlayersTerritory(int row, int col);
 
-    bool checkIfCreatingTerritory(const Cathedral_move *move);
+    void addShapeToPlayerShapes(int pieceNum);
+
+    
+
 
 
 
@@ -76,6 +79,8 @@ public:
     bool is_terminal() const override; 
     void print() const override; 
     bool player1_turn() const override {return turn == 1;} //return true if 1 
+
+    bool legal_move(const Cathedral_move *move) const;
 
     //0 is no one 1 and 2 is player //calculated each time state is constructed 
     int check_winner() const;

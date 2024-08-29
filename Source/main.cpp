@@ -103,14 +103,21 @@ int main(){
                     
                 }
                 if (event.key.code == sf::Keyboard::R) { 
-                    cout << "Playing random game" << endl;
-                    //could this not just be a single rollout 
-                    double result = state->rollout();
-                    // winner = state->check_winner();
+                      int numberOfRandomGames = 1000;
+                        double totalResult = 0.0;
 
-                    cout << "Random game complete result is: " << result << endl;
-                }
+                        cout << "Playing random games" << endl;
+                        
+                        for(int i = 0; i < numberOfRandomGames; i++){
+                            totalResult += state->rollout(); //currently these games are not random at all they all play out the same //probaly bc pick semirandom move is not random 
+                            cout << "Game " << i << " result is: " << totalResult << endl;
+                        }
+                        
+                        double averageResult = totalResult / numberOfRandomGames;
 
+                        cout << "Random games complete. Average result is: " << averageResult << endl;            
+
+                 }
             }
     }
 
