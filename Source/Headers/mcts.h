@@ -29,6 +29,18 @@ struct Cathedral_move : public MCTS_move {
         const Cathedral_move &o = (const Cathedral_move &) other;        // Note: Casting necessary
         return row == o.row && col == o.col && shape == o.shape;
     };
+    string sprint() const override {
+        std::string result;
+        for (const auto& row : shape) {
+            result += "\n"; 
+            for (int val : row) {
+                result += std::to_string(val) + " "; 
+            }
+            
+        }
+        return "shape at row: " + to_string(row) + " col: " + to_string(col) + " " + result;
+    }
+
 };
 
 class Cathedral_state : public MCTS_state {

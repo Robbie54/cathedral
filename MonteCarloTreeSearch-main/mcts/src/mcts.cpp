@@ -175,6 +175,7 @@ MCTS_tree::MCTS_tree(MCTS_state *starting_state) {
     root = new MCTS_node(NULL, starting_state, NULL);
 }
 
+
 MCTS_tree::~MCTS_tree() {
     delete root;
 }

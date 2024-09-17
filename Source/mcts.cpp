@@ -194,16 +194,23 @@ queue<MCTS_move *> *Cathedral_state::actions_to_try() const{
     // cout << "actions to try " << shapes->size() << " "  << endl;
 
     //starts with big pieces first
-    for(int i = shapes->size()-1; i >= 0; i--){
+    int y = 0;
+    // if(shapes->size() > 4){
+    //     y = shapes->size()-2;
+    // }
+
+    for(int i = shapes->size()-1; i >= y; i--){ //should be 0 but  i want to limit the actions 
         const auto& shape = (*shapes)[i]; //dereference to access  
         for(int k = 0; k<4; k++){
             for(int x = 0; x < board.size()-shape.size(); x++){
                 for(int y = 0; y < board[x].size()-shape.size(); y++){
-                    // cout << board[x].size() << " " <<  shape.size() << " " <<  board[x].size()-shape.size() << endl; //printing this 18446708949467004946
                     const Cathedral_move move(x, y, shape);
                    
                     if(legal_move(&move)){ //instead of can place shape at pos
                         Q->push(new Cathedral_move(x,y,shape));
+                        // if(Q->size() > 100){ 
+                        //     return Q;
+                        // }
                     }
 
                 }
@@ -241,7 +248,7 @@ double Cathedral_state::rollout() const{
 
     for(int i = 0 ; i < MAXSTEPS; i++){
         if(curState.is_terminal()){
-             cout << "Terminal in rollout" << endl;
+            //  cout << "Terminal in rollout" << endl;
             // printMatrix(curState.board);
             // cout << curState.player1Shapes.size() << " " << curState.player2Shapes.size() << endl;
             return (curState.check_winner() == 1) ? 1.0 : 0.0; //if white win chance return if black delt with in selectbestchild? idk check quoridor 
@@ -396,14 +403,14 @@ double Cathedral_state::evaluate_position(Cathedral_state &s) const {
             return 0.7;
         }
         cout << "player 1 is winning " << endl;
-        return 1.0;  // Player 1 is winning
+        return 0.9;  // Player 1 is winning
     } else if (shapeDifference < 0) {
         if(shapeDifference >= -1){
             return 0.3;
         }
         cout << "player 2 is winning " << endl;
 
-        return 0.0;  // Player 2 is winning
+        return 0.;  // Player 2 is winning
     } else {
         return 0.5;  // Draw
         cout << "draw " << endl; 

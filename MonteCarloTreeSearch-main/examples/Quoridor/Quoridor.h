@@ -85,6 +85,11 @@ public:
     double rollout() const override;                        // the rollout simulation in MCTS
     void print() const override;
     bool player1_turn() const override { return turn == 'W'; }
+
+
+    //  Quoridor_state* clone() const override {
+    //     return new Quoridor_state(*this);  // Create a copy of Quoridor_state
+    // }
 };
 
 

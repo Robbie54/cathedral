@@ -1,10 +1,14 @@
+#include <thread>
+#include <future>
+
 #include <iostream>
 #include "Quoridor.h"
 #include "../../mcts/include/mcts.h"
 
 /** AI PARAMETERS **/
-#define MAXITER 20000
-#define MAXSECONDS 15
+#define MAXITER 50000
+#define MAXSECONDS 240
+
 
 #define PROMPT "> "
 
@@ -34,6 +38,9 @@ bool parse_coords(const string &s, int &x, int &y) {
     }
     return false;
 }
+
+
+
 
 
 int main() {
@@ -145,6 +152,7 @@ int main() {
                 game_tree->grow_tree(MAXITER, max_seconds);
                 game_tree->print_stats();   // debug
 
+
                 // select best child node at root level
                 MCTS_node *best_child = game_tree->select_best_child();
                 if (best_child == NULL) {
@@ -166,7 +174,89 @@ int main() {
 
                 // check if winning move
                 winner = state->check_winner();
+                }
+            
+        } else if (command == "g") {    // generate AI move
+            if (winner != ' ') {
+                cin.ignore(512, '\n');
+                cout << "Game has already finished." << endl << endl;
+            } else {
+                // determine "thinking time" required
+                double max_seconds = MAXSECONDS;
+                if (state->remaining_walls(state->whose_turn()) == 0) {
+                    // if can't play a wall then there isn't much to think about
+                    max_seconds = (max_seconds >= 5) ? 2.5 : max_seconds / 2;
+                } else if (state->remaining_walls(state->whose_turn() == 'W' ? 'B' : 'W') == 0) {
+                    // if enemy can't play a wall then less thinking is probably required as well
+                    max_seconds = 0.75 * max_seconds;
+                }
+
+                //sudo code for root parralelisation 
+                //create x copys of game tree 
+                //run mcts 
+                //get best move from each tree //could be better to take top 10 and compare 
+                //play move 
+                Quoridor_state *s = new Quoridor_state(*state);
+
+                std::vector<MCTS_tree*> trees;
+                int num_trees = 8; 
+                for (int i = 0; i < num_trees; ++i) {
+                    trees.push_back(new MCTS_tree(s)); 
+                }
+
+                vector<future<void>> futures;
+                for (auto& tree : trees) {
+                    futures.push_back(async(launch::async, [&]() {
+                        tree->grow_tree(MAXITER, max_seconds);
+                    }));
+                }
+
+                // Ensure all threads complete before proceeding
+                for (auto& future : futures) {
+                    future.get();
+                }
+            
+                MCTS_node *best_child;
+                
+                double win_rate = -1;
+
+                for (auto tree : trees) {
+                    tree->print_stats();  
+                    MCTS_node *child = tree->select_best_child();
+                    if (child != NULL) {
+                        double winRateTemp = child->calculate_winrate(state->whose_turn() == 'W' ? 'B' : 'W'); // Assuming you have a method to get win rate
+                        cout << "Win rate is " << winRateTemp << endl;
+                        if(winRateTemp > win_rate){
+                            best_child = tree->select_best_child();
+                        }   
+                    }
+                }
+                
+                const Quoridor_move *best_move = (const Quoridor_move *) best_child->get_move();
+
+                // advance the tree so the selected child node is now the root
+                game_tree->advance_tree(best_move);
+
+                // play AI move
+                bool succ = state->play_move(best_move);
+                if (!succ) {
+                    cerr << "Warning: AI generated illegal move: " <<  best_move->sprint() << endl << endl;
+                } else {
+                    // print AI's move
+                    cout << best_move->sprint() << endl << endl;
+                }
+
+                // check if winning move
+                winner = state->check_winner();
+
+                // Cleanup
+                // for (auto tree : trees) {
+                //     delete tree;
+                // }
             }
+                    
+                   
+                
         } else if (command == "stats") {
             game_tree->print_stats();
         }

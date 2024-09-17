@@ -9,7 +9,7 @@
 
 
 #define STARTING_NUMBER_OF_CHILDREN 32   // expected number so that we can preallocate this many pointers
-// #define PARALLEL_ROLLOUTS                // whether or not to do multiple parallel rollouts
+//  #define PARALLEL_ROLLOUTS                // whether or not to do multiple parallel rollouts
 
 
 using namespace std;
@@ -48,6 +48,8 @@ public:
     const MCTS_state *get_current_state() const;
     void print_stats() const;
     double calculate_winrate(bool player1turn) const;
+
+   
 };
 
 
@@ -64,6 +66,10 @@ public:
     unsigned int get_size() const;
     const MCTS_state *get_current_state() const;
     void print_stats() const;
+
+private:
+    MCTS_node* deep_copy_node(const MCTS_node* node) const;
+
 };
 
 

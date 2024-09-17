@@ -55,19 +55,20 @@ int main(){
             if (event.type == sf::Event::KeyPressed) {
 
                 if (event.key.code == sf::Keyboard::M) {
+                    
                     cout << "MCTS " << endl;
+                   
                     if(winner != 0){
                         cin.ignore(512, '\n');
                         cout << "Game has already finished." << endl << endl;
                     } else {
-                        double max_seconds = 20; //thinking time
-                        double max_iterations = 2000;
+                        double max_seconds = 6; //thinking time
+                        double max_iterations = 50000;
                         game_tree->grow_tree(max_iterations, max_seconds);
                         game_tree->print_stats(); 
                         
                         
                         MCTS_node *best_child = game_tree->select_best_child();
-
                         if (best_child == NULL) {
                             cerr << "Warning: Could not find best child. Tree has no children? Possible terminal node" << endl << endl;
                         }
@@ -92,6 +93,7 @@ int main(){
                         winner = state->check_winner();
 
                     }
+                    
                 
                 }
                 if (event.key.code == sf::Keyboard::P) {
@@ -103,7 +105,7 @@ int main(){
                     
                 }
                 if (event.key.code == sf::Keyboard::R) { 
-                      int numberOfRandomGames = 1000;
+                      int numberOfRandomGames = 100;
                         double totalResult = 0.0;
 
                         cout << "Playing random games" << endl;
@@ -115,7 +117,7 @@ int main(){
                         
                         double averageResult = totalResult / numberOfRandomGames;
 
-                        cout << "Random games complete. Average result is: " << averageResult << endl;            
+                        cout << "Random games complete. Average chance of Player winning is " << averageResult << endl;            
 
                  }
             }
