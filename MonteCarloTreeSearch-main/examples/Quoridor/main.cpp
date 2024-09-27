@@ -7,7 +7,7 @@
 
 /** AI PARAMETERS **/
 #define MAXITER 50000
-#define MAXSECONDS 240
+#define MAXSECONDS 20
 
 
 #define PROMPT "> "
@@ -199,7 +199,7 @@ int main() {
                 Quoridor_state *s = new Quoridor_state(*state);
 
                 std::vector<MCTS_tree*> trees;
-                int num_trees = 8; 
+                int num_trees = 1; 
                 for (int i = 0; i < num_trees; ++i) {
                     trees.push_back(new MCTS_tree(s)); 
                 }

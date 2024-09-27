@@ -40,7 +40,7 @@ void drawBackground(sf::RenderWindow& window){
             }
     }
 
-void drawBoard(sf::RenderWindow& window, Cathedral_state* state){
+void drawBoard(sf::RenderWindow& window, Cathedral_state* state, int posX, int posY){
         sf::Sprite sprite;
 
         sf::Texture texture;
@@ -53,33 +53,35 @@ void drawBoard(sf::RenderWindow& window, Cathedral_state* state){
         for(int i = 0; i < board.size(); i++){
           for(int j = 0; j < board[i].size(); j++){
             if(board[i][j] == 0){
-              continue;
+                sprite.setPosition(static_cast<float>(GRID_SIZE * j + posY * GRID_SIZE), static_cast<float>(GRID_SIZE * i + posX * GRID_SIZE));
+                sprite.setTextureRect(sf::IntRect(0, 0, GRID_SIZE, GRID_SIZE));
+                window.draw(sprite);    
             }
             else if(board[i][j] == cathedral){
-              sprite.setPosition(static_cast<float>(GRID_SIZE * j + minCol * GRID_SIZE), static_cast<float>(GRID_SIZE * i + minRow * GRID_SIZE));
+              sprite.setPosition(static_cast<float>(GRID_SIZE * j + posY * GRID_SIZE), static_cast<float>(GRID_SIZE * i + posX * GRID_SIZE));
               sprite.setTextureRect(sf::IntRect(GRID_SIZE * 3, 0, GRID_SIZE, GRID_SIZE));
               window.draw(sprite);
             }
             else if(board[i][j] >= player1Min && board[i][j] <= player1Max){
-              sprite.setPosition(static_cast<float>(GRID_SIZE * j + minCol * GRID_SIZE), static_cast<float>(GRID_SIZE * i + minRow * GRID_SIZE));
+              sprite.setPosition(static_cast<float>(GRID_SIZE * j + posY * GRID_SIZE), static_cast<float>(GRID_SIZE * i + posX * GRID_SIZE));
               sprite.setTextureRect(sf::IntRect(GRID_SIZE, 0, GRID_SIZE, GRID_SIZE));
 
               window.draw(sprite);
             }
             else if(board[i][j]>= player2Min && board[i][j] <= player2Max){
-              sprite.setPosition(static_cast<float>(GRID_SIZE * j + minCol * GRID_SIZE), static_cast<float>(GRID_SIZE * i + minRow * GRID_SIZE));
+              sprite.setPosition(static_cast<float>(GRID_SIZE * j + posY * GRID_SIZE), static_cast<float>(GRID_SIZE * i + posX * GRID_SIZE));
               sprite.setTextureRect(sf::IntRect(GRID_SIZE * 2, 0, GRID_SIZE, GRID_SIZE));
 
               window.draw(sprite);
             }
             else if(board[i][j] == player1Territory){
-              sprite.setPosition(static_cast<float>(GRID_SIZE * j + minCol * GRID_SIZE), static_cast<float>(GRID_SIZE * i + minRow * GRID_SIZE));
+              sprite.setPosition(static_cast<float>(GRID_SIZE * j + posY * GRID_SIZE), static_cast<float>(GRID_SIZE * i + posX * GRID_SIZE));
               sprite.setTextureRect(sf::IntRect(GRID_SIZE, GRID_SIZE, GRID_SIZE, GRID_SIZE));
 
               window.draw(sprite);
             }
             else if(board[i][j] == player2Territory){
-              sprite.setPosition(static_cast<float>(GRID_SIZE * j + minCol * GRID_SIZE), static_cast<float>(GRID_SIZE * i + minRow * GRID_SIZE));
+              sprite.setPosition(static_cast<float>(GRID_SIZE * j + posY * GRID_SIZE), static_cast<float>(GRID_SIZE * i + posX * GRID_SIZE));
               sprite.setTextureRect(sf::IntRect(GRID_SIZE*2, GRID_SIZE, GRID_SIZE, GRID_SIZE));
 
               window.draw(sprite);
@@ -151,4 +153,28 @@ void drawPieces(sf::RenderWindow& window, Cathedral_state* state){
      
 }
       
+
+
+void drawMove(sf::RenderWindow& window, Cathedral_move* move, int posX, int posY){
+    sf::Sprite sprite;
+    sf::Texture texture;
+    texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
+
+    sprite.setTexture(texture);
+
+    for(int x = 0; x < move->shape.size(); x++){
+      for(int y = 0; y < move->shape[0].size(); y++){
+        if(move->shape[x][y] == 0){
+          continue;
+        }
+        else{
+                sprite.setPosition(static_cast<float>(GRID_SIZE * y + posY * GRID_SIZE + move->col * GRID_SIZE), static_cast<float>(GRID_SIZE * x + posX * GRID_SIZE + GRID_SIZE * move->row));
+                sprite.setTextureRect(sf::IntRect(GRID_SIZE*3, 0, GRID_SIZE, GRID_SIZE));
+                window.draw(sprite);
+        }
+          
+        }
+
+      }
+}
 

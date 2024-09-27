@@ -30,3 +30,5 @@ constexpr unsigned int player2Territory = 50;
 
 
 extern std::vector<std::vector<std::vector<int>>> shapeFullList;
+
+

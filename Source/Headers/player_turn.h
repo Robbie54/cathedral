@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
+#include "../../MonteCarloTreeSearch-main/mcts/include/mcts.h"
 #include "mcts.h"
 
 
 class player_turn {
 
 public:
-    Cathedral_state turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state);
+    Cathedral_state turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state, MCTS_tree *game_tree);
     std::vector<std::vector<int>> findShape( std::vector<std::vector<int>>& matrix, int startX, int startY);
 
 private:

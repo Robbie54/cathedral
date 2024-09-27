@@ -11,7 +11,7 @@
 #include <cmath>
 #include <queue>
 
-Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state) {
+Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state, MCTS_tree *game_tree) {
     //function to add to state are //get a playerShape
     //check collision
     //check not opponent territory 
@@ -152,6 +152,7 @@ Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cat
                         bool noCollision = state->legal_move(&move); //also should checks territory 
 
                             if(noCollision){
+                                game_tree->advance_tree(&move);
                                 state->play_move(&move);
                                 validPlacement = true;
                                 turnComplete = true;

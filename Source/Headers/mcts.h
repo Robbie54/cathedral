@@ -3,7 +3,7 @@
 #include <vector>
 // #include <iostream>
 #include <utility>
-
+#include <random>
 
 #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
 
@@ -38,9 +38,13 @@ struct Cathedral_move : public MCTS_move {
             }
             
         }
+        // window
+        // drawMove(move)  //doesnt work need window //maybe a static windw and static like pos variables //but then its super dependent on how mnay times sprint called and if anything changes it breaks 
+        //instead just add move to a vector of moves //then can use and clear anytime and window can be of this vecotr size
+        //need to be carful adding moves in root mode though if sprint iss called at similar times 
+        //but if i have add moves in state i need to know which state and call that 
         return "shape at row: " + to_string(row) + " col: " + to_string(col) + " " + result;
     }
-
 };
 
 class Cathedral_state : public MCTS_state {
@@ -75,11 +79,12 @@ private:
 
     void addShapeToPlayerShapes(int pieceNum);
 
-    
+    //static so same across all states
+    static default_random_engine generator;
 
+    bool any_actions_to_try() const;
 
-
-
+    vector<Cathedral_move> movesVec; 
 
 public:
     Cathedral_state(); 
@@ -109,6 +114,11 @@ public:
     int containsInt(const std::vector<std::vector<std::vector<int>>>& vec, int target);
     void addShapeToBoard(const Cathedral_move *move);
     int change_turn();
+
+
+    void addMove(Cathedral_move m);
+    
+     
 
 
 

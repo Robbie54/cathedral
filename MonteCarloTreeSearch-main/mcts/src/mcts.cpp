@@ -254,6 +254,67 @@ void MCTS_node::print_stats() const {
     cout << "________________________________" << endl;
 }
 
+void MCTS_node::print_stats_cathedral() const {
+    #define TOPK 10
+    if (number_of_simulations == 0) {
+        cout << "Tree not expanded yet" << endl;
+        return;
+    }
+    cout << "___ INFO _______________________" << endl
+         << "Tree size: " << size << endl
+         << "Number of simulations: " << number_of_simulations << endl
+         << "Branching factor at root: " << children->size() << endl
+        //  << "Branching factor at root 2: " << children->at(0)->children->size() << " " << children->at(1)->children->size() << " " << children->at(3)->children->size() << " " << children->at(5)->children->size()  << " " << children->at(10)->children->size()  << endl
+         << "Chances of P1 winning: " << setprecision(4) << 100.0 * (score / number_of_simulations) << "%" << endl;
+    // sort children based on winrate of player's turn for this node (!)
+    if (state->player1_turn()) {
+        std::sort(children->begin(), children->end(), [](const MCTS_node *n1, const MCTS_node *n2){
+            return n1->calculate_winrate(true) > n2->calculate_winrate(true);
+        });
+    } else {
+        
+        std::sort(children->begin(), children->end(), [](const MCTS_node *n1, const MCTS_node *n2){
+            return n1->calculate_winrate(false) > n2->calculate_winrate(false);
+        });
+    }
+    std::vector<Cathedral_move*> movesVec;
+    // print TOPK of them along with their winrates
+    cout << "Best moves:" << endl;
+    for (int i = 0 ; i < children->size() && i < TOPK ; i++) {
+        cout << "  " << i + 1 << ". " << children->at(i)->move->sprint() << "  -->  "
+             << setprecision(4) << 100.0 * children->at(i)->calculate_winrate(state->player1_turn()) << "%" << endl;
+        
+        movesVec.push_back(const_cast<Cathedral_move*>(static_cast<const Cathedral_move*>(children->at(i)->move)));    
+    }
+    cout << "________________________________" << endl;
+        
+        sf::RenderWindow window2(sf::VideoMode(GRID_SIZE * BOARD_SIZE * 11, (GRID_SIZE * BOARD_SIZE)), "Boards", sf::Style::Close);
+        //Resizing the window.
+        window2.setView(sf::View(sf::FloatRect(0, 0, GRID_SIZE * BOARD_SIZE * 11, GRID_SIZE * BOARD_SIZE)));
+        window2.setPosition(sf::Vector2i(100, 700));
+        window2.clear();
+        for(int i = 0; i < movesVec.size(); i++){
+            drawBoard(window2, static_cast<Cathedral_state*>(state), 0 ,i*(BOARD_SIZE+1));
+            drawMove(window2, movesVec[i], 0, i*(BOARD_SIZE+1));
+        }
+
+        window2.display();
+
+        bool waitingForKeyPress = true;
+        sf::Event event;
+        while (waitingForKeyPress) {
+            if (window2.waitEvent(event)) {
+                if (event.type == sf::Event::KeyPressed) {
+                    if (event.key.code == sf::Keyboard::P){
+                        waitingForKeyPress = false; 
+                    }
+                    
+                }
+            }
+        }
+}
+
+
 double MCTS_node::calculate_winrate(bool player1turn) const {
     if (player1turn) {
         return score / number_of_simulations;
@@ -275,6 +336,7 @@ MCTS_node *MCTS_tree::select_best_child() {
 }
 
 void MCTS_tree::print_stats() const { root->print_stats(); }
+void MCTS_tree::print_stats_cathedral() const { root->print_stats_cathedral(); }
 
 
 /*** MCTS agent ***/

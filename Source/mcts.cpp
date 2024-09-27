@@ -10,6 +10,7 @@
 #include <climits>
 #include <random>
 
+default_random_engine Cathedral_state::generator = default_random_engine(time(NULL));
 
 
 using namespace std;
@@ -31,12 +32,12 @@ using namespace std;
 //     {{0, 1,1},{1,1,0},{1,0,0}}}; //Tower
 
 std::vector<std::vector<std::vector<int>>> shapeFullListPOne{  
-    {{2}}, //Tavern
-    {{3}},
-    {{4, 4}}, //Stable
-    {{5, 5}},
-    {{6, 6},{0,6}}, //Inn
-    {{7,7},{0,7}},
+    // {{2}}, //Tavern
+    // {{3}},
+    // {{4, 4}}, //Stable
+    // {{5, 5}},
+    // {{6, 6},{0,6}}, //Inn
+    // {{7,7},{0,7}},
     {{8,8,8}}, //Bridge
     {{9, 9},{9,9}}, //Square
     {{10, 10,10},{0,10,0}}, //Manor
@@ -47,12 +48,12 @@ std::vector<std::vector<std::vector<int>>> shapeFullListPOne{
     {{0, 15,15},{15,15,0},{15,0,0}}}; //Tower
 
 std::vector<std::vector<std::vector<int>>> shapeFullListPTwo{  
-    {{26}}, //Tavern
-    {{27}},
-    {{28, 28}}, //Stable
-    {{29, 29}},
-    {{30, 30},{0,30}}, //Inn
-    {{31,31},{0,31}},
+    // {{26}}, //Tavern
+    // {{27}}, //Tavern2
+    // {{28, 28}}, //Stable
+    // {{29, 29}}, //Stable2
+    // {{30, 30},{0,30}}, //Inn
+    // {{31,31},{0,31}}, //Inn2
     {{32,32,32}}, //Bridge
     {{33, 33},{33,33}}, //Square
     {{34, 34,34},{0,34,0}}, //Manor
@@ -86,10 +87,9 @@ bool Cathedral_state::is_terminal() const {
 int Cathedral_state::check_winner() const {
 
     
-    queue<MCTS_move*> *Q = actions_to_try();
-    if(Q->empty()){
-        delete Q;
-        // cout << "que empty in check winner " << endl;
+    bool a = any_actions_to_try();
+
+    if(a == false){
         if(player1Shapes.size() > player2Shapes.size()){
             return 2;
         }
@@ -101,41 +101,91 @@ int Cathedral_state::check_winner() const {
         }
     }
 
-    //   Clean up dynamically allocated MCTS_move* objects in the queue  //this helped significantly with memeory i think actions to try is causing the main memory leaks 
-    while (!Q->empty()) {
-        MCTS_move* move = Q->front();
-        Q->pop();
-        delete move;
-    }
-
-    delete Q;
     return 0;
 }
+
+// int Cathedral_state::check_winner() const {
+
+    
+//     queue<MCTS_move*> *Q = actions_to_try();
+//     if(Q->empty()){
+//         delete Q;
+//         // cout << "que empty in check winner " << endl;
+//         if(player1Shapes.size() > player2Shapes.size()){
+//             return 2;
+//         }
+//         else if(player2Shapes.size() > player1Shapes.size()){
+//             return 1;
+//         }
+//         else{
+//             return 3; //tie
+//         }
+//     }
+
+//     //   Clean up dynamically allocated MCTS_move* objects in the queue  //this helped significantly with memeory i think actions to try is causing the main memory leaks 
+//     while (!Q->empty()) {
+//         MCTS_move* move = Q->front();
+//         Q->pop();
+//         delete move;
+//     }
+
+//     delete Q;
+//     return 0;
+// }
+
+bool Cathedral_state::any_actions_to_try() const{
+
+    std::vector<std::vector<std::vector<int>>> shapes;
+    // cout << "actions to try " << player1Shapes.size() << " " << player2Shapes.size() << endl;
+    if (turn == 1) {
+        shapes = player1Shapes;
+    } else if (turn == 2) {
+        shapes = player2Shapes;
+    } else {
+        std::cerr << "Invalid turn number!" << std::endl;
+        return false;
+    }
+    
+
+    //this is not ideal as there is actions to try but idk
+     int y = 0;
+    if(shapes.size() > 4){
+        y = shapes.size()-3;
+    }
+
+    for (int i = shapes.size() - 1; i >= 0; i--) {
+        std::vector<std::vector<int>> currentShape = shapes[i];  // Extract 2D shape
+        for (int k = 0; k < 4; k++) {  // 4 rotations
+            for (int x = 0; x <= board.size() - currentShape.size(); x++) {
+                for (int y = 0; y <= board[x].size() - currentShape[0].size(); y++) {
+                    Cathedral_move move(x, y, currentShape);
+
+                    if (legal_move(&move)) {
+                       return true;
+                    }
+                }
+            }
+
+            // Rotate the 2D shape and reassign it
+            currentShape = rotateMatrix(currentShape);
+        }
+
+        shapes[i] = currentShape;  // Assign rotated shape back to 3D vector
+    }
+    
+    // cout << "Actions to try size " << Q->size() << endl;
+    return false;
+}
+
+
+
+
 
 
 MCTS_state *Cathedral_state::next_state(const MCTS_move *move) const {
     Cathedral_state *new_state = new Cathedral_state(*this);
     new_state->play_move((const Cathedral_move *) move);
     return new_state;
-
-    // Cathedral_move *m = (Cathedral_move *) move;
-    // Cathedral_state *new_state = new Cathedral_state(*this); //create new state from current
-    // for(int row = 0; row < m->shape.size(); row++){
-    //     for(int col = 0; col < m->shape[row].size(); col++){
-    //         //if part of shape and board pos is not empty cant update state 
-    //         //may need territory to 
-    //         if(m->shape[row][col] != 0 && new_state->board[m->row][m->col] != 0 ){
-    //             cerr << "Warning: Illegal move (" << m->row << ", " << m->col << ")" << endl;
-    //             return NULL;
-    //         }
-    //     }
-    // }
-    // //next update board and see if winner 
-    // //maybe also territory 
-    // new_state->board = board; 
-    // new_state->winner = new_state->check_winner();    // check again for a winner
-    // new_state->change_turn(); 
-    // return new_state;
 }
 
 void Cathedral_state::addShapeToBoard(const Cathedral_move *move){ 
@@ -161,32 +211,15 @@ int Cathedral_state::change_turn() {
 }
 
 
-//find a valid move
-//also need to track if a piece should be removed 
-//this could either be correspond with the action being tried or once a piece is played
-//we do a board check to see if any should be removed 
-
-//we also need to track what is a players territory for valid moves 
-//if we do a board check after turn we can see if piece should be removed 
-
-//perhaps if territory is created we number it
-//
-
-//when to check if territory 
-//for actions to try its expensive to search if each action is in territory therefore having number would be efficent 
-
-
-//when an action is tried we check if territory 
-
 queue<MCTS_move *> *Cathedral_state::actions_to_try() const{
     queue<MCTS_move *> *Q = new queue<MCTS_move *>();
 
-    const std::vector<std::vector<std::vector<int>>>* shapes;
+    std::vector<std::vector<std::vector<int>>> shapes;
     // cout << "actions to try " << player1Shapes.size() << " " << player2Shapes.size() << endl;
     if (turn == 1) {
-        shapes = &player1Shapes;
+        shapes = player1Shapes;
     } else if (turn == 2) {
-        shapes = &player2Shapes;
+        shapes = player2Shapes;
     } else {
         std::cerr << "Invalid turn number!" << std::endl;
         return Q;
@@ -194,30 +227,29 @@ queue<MCTS_move *> *Cathedral_state::actions_to_try() const{
     // cout << "actions to try " << shapes->size() << " "  << endl;
 
     //starts with big pieces first
-    int y = 0;
-    // if(shapes->size() > 4){
-    //     y = shapes->size()-2;
-    // }
+    int p = 0;
+    if(shapes.size() > 4){
+        p = shapes.size()-3;
+    }
 
-    for(int i = shapes->size()-1; i >= y; i--){ //should be 0 but  i want to limit the actions 
-        const auto& shape = (*shapes)[i]; //dereference to access  
-        for(int k = 0; k<4; k++){
-            for(int x = 0; x < board.size()-shape.size(); x++){
-                for(int y = 0; y < board[x].size()-shape.size(); y++){
-                    const Cathedral_move move(x, y, shape);
-                   
-                    if(legal_move(&move)){ //instead of can place shape at pos
-                        Q->push(new Cathedral_move(x,y,shape));
-                        // if(Q->size() > 100){ 
-                        //     return Q;
-                        // }
+    for (int i = shapes.size() - 1; i >= 0; i--) {
+        std::vector<std::vector<int>> currentShape = shapes[i];  // Extract 2D shape
+        for (int k = 0; k < 4; k++) {  // 4 rotations
+            for (int x = 0; x <= board.size() - currentShape.size(); x++) {
+                for (int y = 0; y <= board[x].size() - currentShape[0].size(); y++) {
+                    Cathedral_move move(x, y, currentShape);
+
+                    if (legal_move(&move)) {
+                        Q->push(new Cathedral_move(x, y, currentShape));
                     }
-
                 }
             }
 
-            rotateMatrix(shape);
+            // Rotate the 2D shape and reassign it
+            currentShape = rotateMatrix(currentShape);
         }
+
+        shapes[i] = currentShape;  // Assign rotated shape back to 3D vector
     }
     if(Q->empty()){
         // cout << "No actions to try"<< endl;
@@ -280,6 +312,7 @@ double Cathedral_state::rollout() const{
 
 //play move might be deleting to many shapes per move
 bool Cathedral_state::play_move(const Cathedral_move *move){
+   
     if (move == NULL || !legal_move(move)) {
         cout << "Invalid move in play move" << endl;
         return false;
@@ -290,7 +323,7 @@ bool Cathedral_state::play_move(const Cathedral_move *move){
                 continue;
             }
             if (move->row + i < board.size() && move->col + j < board[0].size()
-               && board[move->row+i][move->col+j] == 0) {     
+               && board[move->row+i][move->col+j] == 0 || board[move->row+i][move->col+j] == playerTerritory) { 
                 board[move->row+i][move->col+j] = move->shape[i][j];
                 
             }
@@ -325,7 +358,7 @@ bool Cathedral_state::play_move(const Cathedral_move *move){
         // board_utility b(turn, board); 
         int t = false;  
 
-        if(player1Shapes.size() >= 14 || player2Shapes.size() >= 14){
+        if(player1Shapes.size() >= shapeFullListPOne.size() || player2Shapes.size() >= shapeFullListPTwo.size()){
             firstTurn = true;
             // cout << "first  turn move is col: " << move->col << " row :" << move->row << endl;
            t = checkIfCreatingTerritory(move);
@@ -383,7 +416,7 @@ bool Cathedral_state::legal_move(const Cathedral_move *move) const{
             }
             
             if(move->row + i >= board.size() || move->col + j >= board[0].size()
-               || board[move->row+i][move->col+j] != 0){      //&& board[move->row + i] [move->col + j] != playerTerritory
+               || (board[move->row+i][move->col+j] != 0 && board[move->row + i] [move->col + j] != playerTerritory)){      //&& board[move->row + i] [move->col + j] != playerTerritory
                 return false;
             }
         }
@@ -402,13 +435,13 @@ double Cathedral_state::evaluate_position(Cathedral_state &s) const {
         if(shapeDifference <= 1){
             return 0.7;
         }
-        cout << "player 1 is winning " << endl;
+        // cout << "player 1 is winning " << endl;
         return 0.9;  // Player 1 is winning
     } else if (shapeDifference < 0) {
         if(shapeDifference >= -1){
             return 0.3;
         }
-        cout << "player 2 is winning " << endl;
+        // cout << "player 2 is winning " << endl;
 
         return 0.;  // Player 2 is winning
     } else {
@@ -417,21 +450,117 @@ double Cathedral_state::evaluate_position(Cathedral_state &s) const {
     }
 } 
 
+//why does this return a pointer move
+Cathedral_move *Cathedral_state::pickRandomMove(Cathedral_state &s) const {
+    Cathedral_move *m;
+    
+
+    std::vector<std::vector<std::vector<int>>> shapes;
+    if (turn == 1) {
+        shapes = player1Shapes;
+    } else if (turn == 2) {
+        shapes = player2Shapes;
+    } else {
+        std::cerr << "Invalid turn number!" << std::endl;
+        return m;
+    }
+
+    if(shapes.empty()){
+        std::cout << "shapes empty in pick random move";
+        return m;
+    }
+    
+    for(int i = 0; i < 500; i ++){ //maybe need to check actions to try after a bit 
+    //50 still made more simulations then 5 and then all actions to try after 50 also never/very rare called the all actions to try
+    //mostly 0 typically less then 10 occasionally higher 
+        std::uniform_int_distribution<> dis(0, shapes.size()-1);
+        int shapeIndex = dis(generator);  
+
+        std::uniform_int_distribution<> dis2(1, 4);
+        int rotation = dis2(generator); 
+
+        //pick random shape and rotation and position 
+        //for random positions maybe a vector of options and pop off when not valid 
+        std::vector<std::vector<int>> shapePicked = shapes[shapeIndex];
+
+        for(int i = 0; i < rotation; i++){
+            shapePicked = rotateMatrix(shapePicked);
+        }
+
+        
+        //shuffel an array once of 0 - 9 then iterate through it 
+        vector<int> shuffledX(board.size() - shapePicked.size() + 1);
+        iota(shuffledX.begin(),shuffledX.end(), 0);
+        vector<int> shuffledY(board.size() - shapePicked[0].size() + 1);
+        iota(shuffledY.begin(),shuffledY.end(), 0);
+        
+        for (int x = 0; x <= board.size() - shapePicked.size(); x++) {
+                for (int y = 0; y <= board[x].size() - shapePicked[0].size(); y++) {
+                    Cathedral_move move(x, y, shapePicked);
+                    if(legal_move(&move)) {
+                        if(i > 100){
+                             cout << "Attempts in random move " << i << endl;
+                        }
+                        return new Cathedral_move(x,y,shapePicked);
+                    }
+            }
+        }
+    }
+
+
+    std::cout << "random move selection failed! " << endl;
+    return m; 
+
+    //if random move selection fails get all actions to try 
+    //this might not be necassary as selecting a 1x1 will almost guarentee finding a move
+
+    // queue<MCTS_move*> *Q = s.actions_to_try();
+
+    // MCTS_move *m2;
+
+    // if(!Q->empty()){
+    //      int randomNumber;
+    //     if(Q->size()-1 > 0){
+    //         std::uniform_int_distribution<> dis(1, Q->size()-1);
+    //         randomNumber = dis(generator);  
+        
+    //     } else {
+    //         randomNumber = 1;
+    //     }
+           
+       
+    //     for (int i = 0; i < randomNumber; i++) {
+    //         m2 = Q->front();
+    //         Q->pop();
+    //     }
+
+    //     while (!Q->empty()) {
+    //         MCTS_move* m2 = Q->front();
+    //         Q->pop();
+    //         delete m2;  
+    //     }
+    //     delete Q;  
+
+    //     return static_cast<Cathedral_move*>(m2);
+    // }
+
+    // delete Q; 
+    // cout << "NO RANDOM MOVE IN PICK RANDOM MOVE" <<endl;
+    
+
+}
+
 
 
 Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
-     std::random_device rd;  // Seed
-    std::mt19937 gen(rd()); // Mersenne Twister engine
 
     queue<MCTS_move*> *Q = s.actions_to_try();
 
     MCTS_move *m;
     if(!Q->empty()){
         if(Q->size() > 100){
-           
             std::uniform_int_distribution<> dis(1, 100); // Range [1, 100]
-
-            int randomNumber = dis(gen);
+            int randomNumber = dis(generator);
             for (int i = 0; i <= randomNumber; ++i) {
                 m = static_cast<Cathedral_move*>(Q->front());
                 Q->pop();
@@ -439,7 +568,7 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
         }
         else{
             std::uniform_int_distribution<> dis(1, Q->size()-1);
-            int randomNumber = dis(gen);
+            int randomNumber = dis(generator);
 
             for (int i = 0; i <= randomNumber; ++i) {
                 m = static_cast<Cathedral_move*>(Q->front());
@@ -460,42 +589,6 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
     cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE" <<endl;
 
 }
-
-Cathedral_move *Cathedral_state::pickRandomMove(Cathedral_state &s) const {
-      
-    std::random_device rd;  // Seed
-    std::mt19937 gen(rd()); // Mersenne Twister engine
-
-    queue<MCTS_move*> *Q = s.actions_to_try();
-
-    MCTS_move *m;
-    if(!Q->empty()){
-        std::uniform_int_distribution<> dis(1, Q->size()-1);
-        int randomNumber = dis(gen);
-
-        for (int i = 0; i <= randomNumber; ++i) {
-            m = Q->front();
-            Q->pop();
-        }
-
-        while (!Q->empty()) {
-            MCTS_move* m = Q->front();
-            Q->pop();
-            delete m;  
-        }
-        delete Q;  
-
-        return static_cast<Cathedral_move*>(m);
-    }
-
-    delete Q; 
-    cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE" <<endl;
-    
-
-}
-
-
-
 
 
 
@@ -730,7 +823,7 @@ void Cathedral_state::addShapeToPlayerShapes(int pieceNum){
                     player1Shapes.push_back(shape);
                 }
             
-                return; // Exit after adding the shape
+                return; 
             }
             i++;
         }
@@ -747,7 +840,7 @@ void Cathedral_state::addShapeToPlayerShapes(int pieceNum){
                     player2Shapes.push_back(shape);
                 }
             
-                return; // Exit after adding the shape
+                return; 
             }
             i++;
         }
@@ -756,3 +849,10 @@ void Cathedral_state::addShapeToPlayerShapes(int pieceNum){
      cout << "Invalid pieceNum or turn when trying to add shape to player shapes" << endl;
      return;
 }
+
+
+
+void Cathedral_state::addMove(Cathedral_move m){
+    movesVec.push_back(m);
+}
+    
