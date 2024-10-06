@@ -86,7 +86,6 @@ bool Cathedral_state::is_terminal() const {
 
 int Cathedral_state::check_winner() const {
 
-    
     bool a = any_actions_to_try();
 
     if(a == false){
@@ -166,6 +165,15 @@ bool Cathedral_state::any_actions_to_try() const{
                 }
             }
 
+             int shapeNum = 0; // Default value
+
+            if (!currentShape.empty() && !currentShape[0].empty()) {
+                shapeNum = currentShape[0][0] != 0 ? currentShape[0][0] : (currentShape[0].size() > 1 ? currentShape[0][1] : 0);
+            }
+            if(shapeNum ==13 ||shapeNum == 37 || shapeNum == 33 || shapeNum ==9){
+                k=4;
+                continue;
+            }
             // Rotate the 2D shape and reassign it
             currentShape = rotateMatrix(currentShape);
         }
@@ -244,7 +252,16 @@ queue<MCTS_move *> *Cathedral_state::actions_to_try() const{
                     }
                 }
             }
+            
+            int shapeNum = 0; // Default value
 
+            if (!currentShape.empty() && !currentShape[0].empty()) {
+                shapeNum = currentShape[0][0] != 0 ? currentShape[0][0] : (currentShape[0].size() > 1 ? currentShape[0][1] : 0);
+            }
+            if(shapeNum ==13 ||shapeNum == 37 || shapeNum == 33 || shapeNum ==9){
+                k=4;
+                continue;
+            }
             // Rotate the 2D shape and reassign it
             currentShape = rotateMatrix(currentShape);
         }
@@ -484,7 +501,9 @@ Cathedral_move *Cathedral_state::pickRandomMove(Cathedral_state &s) const {
         std::vector<std::vector<int>> shapePicked = shapes[shapeIndex];
 
         for(int i = 0; i < rotation; i++){
-            shapePicked = rotateMatrix(shapePicked);
+            if(shapePicked[0][0] != 13){
+                shapePicked = rotateMatrix(shapePicked);
+            }
         }
 
         

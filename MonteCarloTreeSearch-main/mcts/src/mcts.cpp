@@ -264,7 +264,6 @@ void MCTS_node::print_stats_cathedral() const {
          << "Tree size: " << size << endl
          << "Number of simulations: " << number_of_simulations << endl
          << "Branching factor at root: " << children->size() << endl
-        //  << "Branching factor at root 2: " << children->at(0)->children->size() << " " << children->at(1)->children->size() << " " << children->at(3)->children->size() << " " << children->at(5)->children->size()  << " " << children->at(10)->children->size()  << endl
          << "Chances of P1 winning: " << setprecision(4) << 100.0 * (score / number_of_simulations) << "%" << endl;
     // sort children based on winrate of player's turn for this node (!)
     if (state->player1_turn()) {
@@ -282,8 +281,19 @@ void MCTS_node::print_stats_cathedral() const {
     cout << "Best moves:" << endl;
     for (int i = 0 ; i < children->size() && i < TOPK ; i++) {
         cout << "  " << i + 1 << ". " << children->at(i)->move->sprint() << "  -->  "
-             << setprecision(4) << 100.0 * children->at(i)->calculate_winrate(state->player1_turn()) << "%" << endl;
+             << setprecision(4) << 100.0 * children->at(i)->calculate_winrate(state->player1_turn()) << "%   ";
+
+        if (children->at(i)->children != nullptr) {
+            cout << "Branching factor at child root: " << children->at(i)->children->size() << endl;
+            // cout << " Branching factor at child root of child root: " << children->at(i)->children->at(children->at(i)->children->size()/2)->children->size() << endl; 
+
+        } else {
+            cout << "Child of child has no children." << endl;
+        }
         
+        
+
+            
         movesVec.push_back(const_cast<Cathedral_move*>(static_cast<const Cathedral_move*>(children->at(i)->move)));    
     }
     cout << "________________________________" << endl;

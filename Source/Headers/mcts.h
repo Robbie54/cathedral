@@ -38,12 +38,17 @@ struct Cathedral_move : public MCTS_move {
             }
             
         }
-        // window
-        // drawMove(move)  //doesnt work need window //maybe a static windw and static like pos variables //but then its super dependent on how mnay times sprint called and if anything changes it breaks 
-        //instead just add move to a vector of moves //then can use and clear anytime and window can be of this vecotr size
-        //need to be carful adding moves in root mode though if sprint iss called at similar times 
-        //but if i have add moves in state i need to know which state and call that 
-        return "shape at row: " + to_string(row) + " col: " + to_string(col) + " " + result;
+        int shapeNum; 
+        if(shape[0][0] != 0){
+            shapeNum = shape[0][0];
+        }
+        else{
+            if(shape[0].size() > 1){
+                shapeNum = shape[0][1];
+            }
+        }
+        
+        return "shape " + to_string(shapeNum) +  " at row: " + to_string(row) + " col: " + to_string(col);
     }
 };
 

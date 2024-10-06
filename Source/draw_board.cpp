@@ -169,7 +169,7 @@ void drawMove(sf::RenderWindow& window, Cathedral_move* move, int posX, int posY
         }
         else{
                 sprite.setPosition(static_cast<float>(GRID_SIZE * y + posY * GRID_SIZE + move->col * GRID_SIZE), static_cast<float>(GRID_SIZE * x + posX * GRID_SIZE + GRID_SIZE * move->row));
-                sprite.setTextureRect(sf::IntRect(GRID_SIZE*3, 0, GRID_SIZE, GRID_SIZE));
+               sprite.setTextureRect(sf::IntRect(GRID_SIZE*3, GRID_SIZE, GRID_SIZE, GRID_SIZE));
                 window.draw(sprite);
         }
           

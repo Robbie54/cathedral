@@ -79,10 +79,10 @@ int main(){
                         cout << "Game has already finished." << endl << endl;
                     } else {
                         cout << "Root MCTS " << endl;
-                        double max_seconds = 2; //thinking time
+                        double max_seconds = 60; //thinking time
                         double max_iterations = 50000;
 
-                        bool activateRootMCTS = false;
+                        bool activateRootMCTS = true;
                         MCTS_node *best_child;
                         if(!activateRootMCTS){
                             cout << "Sequential MCTS" << endl;
