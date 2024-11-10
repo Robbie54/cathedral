@@ -189,6 +189,20 @@ void MCTS_tree::grow_tree(int max_iter, double max_time_in_seconds) {
     time_t start_t, now_t;
     time(&start_t);
     for (int i = 0 ; i < max_iter ; i++){
+        if(i%1000 == 0 && i > 0){
+            Cathedral_move *m;
+            double s = root->get_score();
+            double n = root->get_number_of_simulations();
+            // cout << "Iteration " << i << " Score " << s << " Number of simulations: " << n << " Percentage " << s/n*100 << endl;
+            dt = difftime(now_t, start_t);
+            cout <<i << " , " << n << " , " << s << " , "<< s/n*100  << " , " << dt <<  endl;
+            // cout << s/n*100 << endl;
+
+            // print_stats_cathedral();
+            // get_convergence_info();
+            
+
+        }
         // select node to expand according to tree policy
         node = select();
         // expand it (this will perform a rollout and backpropagate the results)
@@ -281,10 +295,10 @@ void MCTS_node::print_stats_cathedral() const {
     cout << "Best moves:" << endl;
     for (int i = 0 ; i < children->size() && i < TOPK ; i++) {
         cout << "  " << i + 1 << ". " << children->at(i)->move->sprint() << "  -->  "
-             << setprecision(4) << 100.0 * children->at(i)->calculate_winrate(state->player1_turn()) << "%   ";
+             << setprecision(4) << 100.0 * children->at(i)->calculate_winrate(state->player1_turn()) << "%   Number of simulations: " << children->at(i)->number_of_simulations;
 
         if (children->at(i)->children != nullptr) {
-            cout << "Branching factor at child root: " << children->at(i)->children->size() << endl;
+            cout << "  Branching factor at child root: " << children->at(i)->children->size() << endl;
             // cout << " Branching factor at child root of child root: " << children->at(i)->children->at(children->at(i)->children->size()/2)->children->size() << endl; 
 
         } else {
@@ -322,6 +336,72 @@ void MCTS_node::print_stats_cathedral() const {
                 }
             }
         }
+}
+
+double MCTS_node::get_score(){
+    return score;
+}
+
+std::tuple<unsigned int, unsigned int, unsigned int> MCTS_node::convergence_tracker() const {
+    #define TOPK 10 
+    if (number_of_simulations == 0) {
+        cout << "Tree not expanded yet" << endl;
+        
+    }
+    
+    if(number_of_simulations%1000 == 0 && children->size()){
+        if (state->player1_turn()) {
+            std::sort(children->begin(), children->end(), [](const MCTS_node *n1, const MCTS_node *n2){
+                return n1->calculate_winrate(true) > n2->calculate_winrate(true);
+            });
+        } else {
+            std::sort(children->begin(), children->end(), [](const MCTS_node *n1, const MCTS_node *n2){
+                return n1->calculate_winrate(false) > n2->calculate_winrate(false);
+            });
+        }
+
+        // for (int i = 0 ; i < children->size() && i < TOPK ; i++) {
+        
+        MCTS_node* best_child = children->at(0);
+        
+        best_child->calculate_winrate(state->player1_turn());
+
+        const MCTS_move* base_move = best_child->move; // Assuming move is of type MCTS_move*
+        const Cathedral_move* cathedral_move = dynamic_cast<const Cathedral_move*>(base_move);
+
+        if (best_child->move != nullptr) {
+            // Cathedral_move m = const_cast<Cathedral_move*>(static_cast<const Cathedral_move*>(best_child->move)); 
+            unsigned int s = best_child->number_of_simulations;
+            unsigned int row = cathedral_move->row; 
+            unsigned int col = cathedral_move->col; 
+            return {row, col, s};
+        }
+
+        }
+    
+
+   
+}
+
+void MCTS_tree::get_convergence_info(){
+    static double bestMoveTrackingRow =-1;
+    static double bestMoveTrackingCol =-1;
+
+    tuple<unsigned int, unsigned int, unsigned int> result = root->convergence_tracker();
+    
+    unsigned int numberOfSimulations = std::get<2>(result);
+    unsigned int row = std::get<0>(result);
+    unsigned int col = std::get<1>(result);
+    // if(numberOfSimulations != 0 && bestMoveTracking != NULL && numberOfSimulationsTracking != 0){
+        if(row == bestMoveTrackingRow && col == bestMoveTrackingCol){
+            cout << "Found the same move r: " << row << " c: " << col << " Simulations " << numberOfSimulations << endl;
+        }
+        else {
+            cout << "Different Move from r: " << bestMoveTrackingRow << " c: " << bestMoveTrackingCol << " to r: " << row << " c: " << col << " Simulations " << numberOfSimulations << endl;
+            bestMoveTrackingRow = row;
+            bestMoveTrackingCol = col;
+        }
+    // }
 }
 
 

@@ -517,9 +517,9 @@ Cathedral_move *Cathedral_state::pickRandomMove(Cathedral_state &s) const {
                 for (int y = 0; y <= board[x].size() - shapePicked[0].size(); y++) {
                     Cathedral_move move(x, y, shapePicked);
                     if(legal_move(&move)) {
-                        if(i > 100){
-                             cout << "Attempts in random move " << i << endl;
-                        }
+                        // if(i > 100){
+                        //      cout << "Attempts in random move " << i << endl;
+                        // }
                         return new Cathedral_move(x,y,shapePicked);
                     }
             }

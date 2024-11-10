@@ -78,9 +78,9 @@ int main(){
                         cin.ignore(512, '\n');
                         cout << "Game has already finished." << endl << endl;
                     } else {
-                        cout << "Root MCTS " << endl;
-                        double max_seconds = 60; //thinking time
-                        double max_iterations = 50000;
+                       
+                        double max_seconds = 300; //thinking time
+                        double max_iterations = 51000;
 
                         bool activateRootMCTS = true;
                         MCTS_node *best_child;
@@ -96,6 +96,7 @@ int main(){
                             }
                         }
                         else{
+                            cout << "Root MCTS " << endl;
                             Cathedral_state *s = new Cathedral_state(*state);
 
                             std::vector<MCTS_tree*> trees;
@@ -223,30 +224,34 @@ int main(){
                     m = Cathedral_move(2,7, Tower);
                     state->play_move(&m);
                     game_tree->advance_tree(&m);
-
                     m = Cathedral_move(3,3, twoManor);
                     state->play_move(&m);
                     game_tree->advance_tree(&m);
-
-                    m = Cathedral_move(5,5, Castle);
-                    state->play_move(&m);
-                    game_tree->advance_tree(&m);
-                    m = Cathedral_move(5,0, twoAbbey);
-                    state->play_move(&m);
-                    game_tree->advance_tree(&m);
-                    m = Cathedral_move(7,0, Academy);
-                    state->play_move(&m);
-                    game_tree->advance_tree(&m);
-                    m = Cathedral_move(0,4, twoAcademy);
-                    state->play_move(&m);
-                    game_tree->advance_tree(&m);
-                    m = Cathedral_move(0,7, Abbey);
-                    state->play_move(&m);
-                    game_tree->advance_tree(&m);
-                    m = Cathedral_move(6,7, twoInfirmary);
-                    state->play_move(&m);
-                    game_tree->advance_tree(&m);
-                }
+                    // m = Cathedral_move(5,5, Castle);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                    // m = Cathedral_move(5,0, twoAbbey);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                    // m = Cathedral_move(7,0, Academy);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                    // m = Cathedral_move(0,4, twoAcademy);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                    // m = Cathedral_move(0,7, Abbey);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                    // m = Cathedral_move(6,7, twoInfirmary);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                    // m = Cathedral_move(8,5, Manor);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                    // m = Cathedral_move(2,2, twoBridge);
+                    // state->play_move(&m);
+                    // game_tree->advance_tree(&m);
+                }   
 
             }
     }

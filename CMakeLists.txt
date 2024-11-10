@@ -31,7 +31,7 @@ set_target_properties(Main PROPERTIES
 # target_link_libraries(Mint sfml-graphics sfml-window sfml-system pthread)
 
 # # Define PARALLEL_ROLLOUTS to enable parallel rollouts
-# # target_compile_definitions(Main PRIVATE PARALLEL_ROLLOUTS)
+# target_compile_definitions(Main PRIVATE PARALLEL_ROLLOUTS)
 
 # set_target_properties(Mint PROPERTIES
 #     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin

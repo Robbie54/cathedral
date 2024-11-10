@@ -52,14 +52,18 @@ public:
     const MCTS_state *get_current_state() const;
     void print_stats() const;
     void print_stats_cathedral() const;
+    std::tuple<unsigned int, unsigned int, unsigned int> convergence_tracker() const;
+
     double calculate_winrate(bool player1turn) const;
+    double get_score();
+    double get_number_of_simulations() { return number_of_simulations;}
 
    
 };
 
 
 
-class MCTS_tree {
+class MCTS_tree {    
     MCTS_node *root;
 public:
     MCTS_tree(MCTS_state *starting_state);
@@ -72,11 +76,7 @@ public:
     const MCTS_state *get_current_state() const;
     void print_stats() const;
     void print_stats_cathedral() const;
-
-
-private:
-    MCTS_node* deep_copy_node(const MCTS_node* node) const;
-
+    void get_convergence_info();
 };
 
 
