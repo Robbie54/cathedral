@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 
-#include "mcts.h"
+#include "Mcts.h"
 
 void printMatrix(const std::vector<std::vector<int>>& matrix);
 

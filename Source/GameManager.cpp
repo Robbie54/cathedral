@@ -1,0 +1,137 @@
+#include "Headers/GameManager.h"
+#include "Headers/DrawBoard.h"
+#include "Headers/MatrixUtility.h"
+#include <iostream>
+#include <thread>
+#include <future>
+using namespace std;
+
+GameManager::GameManager(sf::RenderWindow& win) : window(win), state(nullptr), game_tree(nullptr), winner(0) {
+    initialiseGame();
+}
+
+GameManager::~GameManager() {
+    delete state;
+    delete game_tree;
+}
+
+void GameManager::run() {
+    while (window.isOpen()) {
+        window.clear();
+        drawBackground(window);
+        drawBoard(window, state);
+        drawPieces(window, state);
+        window.display();
+
+        if (!processEvents()) break;
+    }
+}
+
+void GameManager::initialiseGame() {
+    vector<vector<int>> blankBoard(10, vector<int>(10, 0));
+    state = new Cathedral_state();
+
+    cout << "Add cathedral? (Y/N)" << endl;
+    while (true) {
+        if (window.waitEvent(event) && event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Y) {
+                Cathedral_move m = addCathedral(blankBoard);
+                state->addShapeToBoard(&m);
+                game_tree = new MCTS_tree(new Cathedral_state(*state));
+                break;
+            } else if (event.key.code == sf::Keyboard::N) {
+                game_tree = new MCTS_tree(new Cathedral_state(*state));
+                break;
+            }
+        }
+    }
+}
+
+bool GameManager::processEvents() {
+    while (window.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            window.close();
+            return false;
+        }
+
+        if (event.type == sf::Event::KeyPressed) {
+            switch (event.key.code) {
+                case sf::Keyboard::M:
+                    if (winner == 0) {
+                        performMCTSMove();
+                        winner = state->check_winner();
+                    } else {
+                        cout << "Game has finished." << endl;
+                    }
+                    break;
+                case sf::Keyboard::P:
+                    performPlayerMove();
+                    break;
+                case sf::Keyboard::R:
+                    // rollout
+                    break;
+                case sf::Keyboard::A:
+                    // auto game
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    return true;
+}
+
+void GameManager::performPlayerMove() {
+    PlayerTurn player;
+    player.turn(window, event, state, game_tree);
+}
+
+void GameManager::performMCTSMove() {
+    double max_seconds = 300;
+    double max_iterations = 51000;
+    bool activateRootMCTS = true;
+    MCTS_node* best_child = nullptr;
+
+    if (!activateRootMCTS) {
+        game_tree->grow_tree(max_iterations, max_seconds);
+        best_child = game_tree->select_best_child();
+    } else {
+        Cathedral_state* copy = new Cathedral_state(*state);
+        vector<MCTS_tree*> trees;
+        for (int i = 0; i < 4; ++i)
+            trees.push_back(new MCTS_tree(copy));
+
+        vector<future<void>> futures;
+        for (auto& tree : trees)
+            futures.push_back(async(launch::async, [&tree, max_iterations, max_seconds]() {
+                tree->grow_tree(max_iterations, max_seconds);
+            }));
+        for (auto& future : futures) future.get();
+
+        double best_rate = -1;
+        for (auto tree : trees) {
+            MCTS_node* child = tree->select_best_child();
+            if (child) {
+                double rate = child->calculate_winrate(state->player1_turn());
+                if (rate > best_rate) {
+                    best_child = child;
+                    best_rate = rate;
+                }
+            }
+        }
+
+        for (auto tree : trees) delete tree;
+        delete copy;
+    }
+
+    if (best_child) {
+        const Cathedral_move* move = (const Cathedral_move*)best_child->get_move();
+        game_tree->advance_tree(move);
+        if (!state->play_move(move))
+            cerr << "Illegal move: " << move->sprint() << endl;
+        else
+            cout << "AI played: " << move->sprint() << endl;
+    } else {
+        cout << "No valid move found." << endl;
+    }
+}

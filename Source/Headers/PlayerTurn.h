@@ -2,12 +2,12 @@
 
 #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
 #include "../../MonteCarloTreeSearch-main/mcts/include/mcts.h"
-#include "mcts.h"
+#include "Mcts.h"
 #include <vector>
 
 
 
-class player_turn {
+class PlayerTurn {
 
 public:
     Cathedral_state turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state, MCTS_tree *game_tree); //should just pass the move back not handle game tree here

@@ -5,9 +5,9 @@
 //possibly add an update board on map in matrix utility class 
 
 //will need mousePos, board, current shape being placed 
-class board_utility{
+class BoardUtility{
     public:
-    board_utility(const int& currentPlayer, const std::vector<std::vector<int>>& board)
+    BoardUtility(const int& currentPlayer, const std::vector<std::vector<int>>& board)
             : player(currentPlayer), _board(board), rows(board.size()), cols(board[0].size()) {
             notPlayer = (player == 1) ? 2 : 1;
             if (player == 1) {

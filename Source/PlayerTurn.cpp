@@ -1,17 +1,17 @@
 #include <SFML/Graphics.hpp>
 
-#include "Headers/player_turn.h"
-#include "Headers/global.h"
-#include "Headers/draw_board.h"
-// #include "Headers/board_utility.h"
-#include "Headers/matrix_utility.h"
-#include "Headers/mcts.h"
+#include "Headers/PlayerTurn.h"
+#include "Headers/Global.h"
+#include "Headers/DrawBoard.h"
+// #include "Headers/BoardUtility.h"
+#include "Headers/MatrixUtility.h"
+#include "Headers/Mcts.h"
 
 #include <iostream>
 #include <cmath>
 #include <queue>
 
-Cathedral_state player_turn::turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state, MCTS_tree *game_tree) {
+Cathedral_state PlayerTurn::turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state, MCTS_tree *game_tree) {
     std::vector<std::vector<int>> singlePieceMap;
     vector<std::vector<std::vector<int>>> playersShapes; 
     
@@ -160,7 +160,7 @@ foundFirst:
 
 
 
-std::pair<int, int> player_turn::convertMousePosToGridCoords(const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
+std::pair<int, int> PlayerTurn::convertMousePosToGridCoords(const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
     int gridX = mousePosWorld.x / GRID_SIZE;
     int gridY = mousePosWorld.y / GRID_SIZE;
 
@@ -187,7 +187,7 @@ std::pair<int, int> player_turn::convertMousePosToGridCoords(const std::vector<s
 }
 
 
-int player_turn::getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event,
+int PlayerTurn::getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event,
                                        const std::vector<std::vector<std::vector<int>>>& shapes)
 {
     std::string inputString;
@@ -225,7 +225,7 @@ int player_turn::getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event
 }
 
 
-void player_turn::renderTurnPreview(
+void PlayerTurn::renderTurnPreview(
     sf::RenderWindow& window,
     Cathedral_state* state,
     const std::vector<std::vector<int>>& shape,

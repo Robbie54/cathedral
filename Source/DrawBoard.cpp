@@ -1,8 +1,8 @@
 #include <SFML/Graphics.hpp>
 
-#include "Headers/global.h"
-#include "Headers/draw_board.h"
-#include "Headers/mcts.h"
+#include "Headers/Global.h"
+#include "Headers/DrawBoard.h"
+#include "Headers/Mcts.h"
 
 
 #include <utility>

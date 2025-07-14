@@ -1,7 +1,7 @@
 #pragma once
-#include "mcts.h"
+#include "Mcts.h"
 
-#include "global.h"
+#include "Global.h"
 
 
 void drawBackground(sf::RenderWindow& window);

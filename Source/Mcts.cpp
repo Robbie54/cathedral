@@ -1,8 +1,8 @@
 
-#include "Headers/global.h"
-#include "Headers/mcts.h"
-#include "Headers/matrix_utility.h"
-// #include "Headers/board_utility.h"
+#include "Headers/Global.h"
+#include "Headers/Mcts.h"
+#include "Headers/MatrixUtility.h"
+// #include "Headers/BoardUtility.h"
 
 #include <vector>
 #include <iostream>
@@ -372,7 +372,7 @@ bool Cathedral_state::play_move(const Cathedral_move *move){
     else {
         cout << "Error with turn in play move " << endl;
     }
-        // board_utility b(turn, board); 
+        // BoardUtility b(turn, board); 
         int t = false;  
 
         if(player1Shapes.size() >= shapeFullListPOne.size() || player2Shapes.size() >= shapeFullListPTwo.size()){

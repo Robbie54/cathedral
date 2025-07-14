@@ -1,8 +1,8 @@
 
-#include "Headers/global.h"
-#include "Headers/mcts.h"
+#include "Headers/Global.h"
+#include "Headers/Mcts.h"
 #include <SFML/Graphics.hpp>
-#include "Headers/matrix_utility.h"
+#include "Headers/MatrixUtility.h"
 
 
 //if its taking the reference why does it need to return it 
