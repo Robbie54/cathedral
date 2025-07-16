@@ -2,7 +2,6 @@
 
 #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
 #include "../../MonteCarloTreeSearch-main/mcts/include/mcts.h"
-#include "Mcts.h"
 #include <vector>
 
 

@@ -1,8 +1,8 @@
 #pragma once
 // #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
-#include "mcts.h"
+#include "Mcts.h"
 //this class is for calculations that happen on the board 
-//possibly add an update board on map in matrix utility class 
+//possibly add an update board on map in matrix Utility class 
 
 //will need mousePos, board, current shape being placed 
 class BoardUtility{

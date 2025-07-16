@@ -13,7 +13,7 @@
 #include "Headers/MatrixUtility.h"
 #include "Headers/PlayerTurn.h"
 
-#include "Headers/mcts.h"
+#include "Headers/Mcts.h"
 
 
 

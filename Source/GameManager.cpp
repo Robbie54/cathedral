@@ -1,6 +1,7 @@
 #include "Headers/GameManager.h"
 #include "Headers/DrawBoard.h"
 #include "Headers/MatrixUtility.h"
+#include "Headers/EvaluationMetric.h"
 #include <iostream>
 #include <thread>
 #include <future>
@@ -31,20 +32,9 @@ void GameManager::initialiseGame() {
     vector<vector<int>> blankBoard(10, vector<int>(10, 0));
     state = new Cathedral_state();
 
-    cout << "Add cathedral? (Y/N)" << endl;
-    while (true) {
-        if (window.waitEvent(event) && event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Y) {
-                Cathedral_move m = addCathedral(blankBoard);
-                state->addShapeToBoard(&m);
-                game_tree = new MCTS_tree(new Cathedral_state(*state));
-                break;
-            } else if (event.key.code == sf::Keyboard::N) {
-                game_tree = new MCTS_tree(new Cathedral_state(*state));
-                break;
-            }
-        }
-    }
+    Cathedral_move m = addCathedral(blankBoard);
+    state->addShapeToBoard(&m);
+    game_tree = new MCTS_tree(new Cathedral_state(*state));
 }
 
 bool GameManager::processEvents() {
@@ -66,6 +56,7 @@ bool GameManager::processEvents() {
                     break;
                 case sf::Keyboard::P:
                     performPlayerMove();
+                    EvaluationMetric::evaluate(*state);
                     break;
                 case sf::Keyboard::R:
                     // rollout
@@ -73,6 +64,9 @@ bool GameManager::processEvents() {
                 case sf::Keyboard::A:
                     // auto game
                     break;
+                case sf::Keyboard::E:
+                    EvaluationMetric::evaluate(*state);
+                    break; 
                 default:
                     break;
             }
@@ -87,9 +81,9 @@ void GameManager::performPlayerMove() {
 }
 
 void GameManager::performMCTSMove() {
-    double max_seconds = 300;
+    double max_seconds = 10;
     double max_iterations = 51000;
-    bool activateRootMCTS = true;
+    bool activateRootMCTS = false;
     MCTS_node* best_child = nullptr;
 
     if (!activateRootMCTS) {
