@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Mcts.h"
+#include "CathedralState.h"
 #include "PlayerTurn.h"
 
 class GameManager {
@@ -19,7 +19,7 @@ private:
 
     sf::RenderWindow& window;
     sf::Event event;
-    Cathedral_state* state;
+    const Cathedral_state* state;
     MCTS_tree* game_tree;
     int winner;
 };

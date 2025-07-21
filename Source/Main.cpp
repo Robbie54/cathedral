@@ -1,10 +1,10 @@
 #include <SFML/Graphics.hpp>
 
 
-#include "Headers/DrawBoard.h"
+#include "Headers/ScreenRenderer.h"
 #include "Headers/Global.h"
 #include "Headers/PlayerTurn.h"
-#include "Headers/Mcts.h"
+#include "Headers/CathedralState.h"
 #include "Headers/MatrixUtility.h"
 #include "../MonteCarloTreeSearch-main/mcts/include/mcts.h"
 

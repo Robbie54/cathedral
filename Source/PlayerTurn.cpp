@@ -2,47 +2,45 @@
 
 #include "Headers/PlayerTurn.h"
 #include "Headers/Global.h"
-#include "Headers/DrawBoard.h"
+#include "Headers/ScreenRenderer.h"
 // #include "Headers/BoardUtility.h"
 #include "Headers/MatrixUtility.h"
-#include "Headers/Mcts.h"
+#include "Headers/CathedralState.h"
 
 #include <iostream>
 #include <cmath>
 #include <queue>
 
-Cathedral_state PlayerTurn::turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state, MCTS_tree *game_tree) {
+
+//from examples they have a state that gets changed in main loop and a seperate game_tree. It is necassary to ensure you update them and keep them the same
+void PlayerTurn::turn(sf::RenderWindow& window, sf::Event event, MCTS_tree *game_tree) {
+
+    const Cathedral_state* state = dynamic_cast<const Cathedral_state*>(game_tree->get_current_state());    
+    const vector<vector<int>> pieceMap = updatePieceMapWithShapesRemaining(state->get_state_info().player1Shapes, state->get_state_info().player2Shapes);
+
+
     std::vector<std::vector<int>> singlePieceMap;
-    vector<std::vector<std::vector<int>>> playersShapes; 
-    
+
     _player = state->get_state_info().turn;
 
     if(_player == 1){
-         playersShapes = state->get_state_info().player1Shapes;
-        // _playerMin = player1Min;
-        // _playerMax = player1Max; 
+        _playerMin = player1Min;
+        _playerMax = player1Max; 
 
         
     } 
     else{
-        playersShapes = state->get_state_info().player2Shapes;
-
-        // _playerMin = player2Min;
-        // _playerMax = player2Max; 
+        _playerMin = player2Min;
+        _playerMax = player2Max; 
     }
 
     int pieceNum = 0;
-  
-
 
     bool turnComplete = false;
 
     while(!turnComplete) {
-        int pieceNum = getUserSelectedPiece(window, event, playersShapes);
-        if (pieceNum == -1) return *state; // User closed window
-
-
-        singlePieceMap = playersShapes[pieceNum];
+            std::vector<std::vector<int>> singlePieceMap = getUserSelectedPiece(window, event, pieceMap);
+        if (pieceNum == -1) return; // User closed window
 
         bool validPlacement = false;
         while (!validPlacement) {
@@ -58,8 +56,6 @@ Cathedral_state PlayerTurn::turn(sf::RenderWindow& window, sf::Event event, Cath
 
             renderTurnPreview(window, state, singlePieceMap, mousePosWorld);
 
-
-
             while (window.pollEvent(event)) {
                 // Check for close event to exit the game loop
                 if (event.type == sf::Event::Closed) {
@@ -68,21 +64,24 @@ Cathedral_state PlayerTurn::turn(sf::RenderWindow& window, sf::Event event, Cath
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
                     window.clear();
-                    drawBackground(window);
-                    drawBoard(window,state);
-                    drawPieces(window, state);
+                    ScreenRenderer::drawBackground(window);
+                    ScreenRenderer::drawBoard(window,state->get_state_info().board);
+                    vector<vector<int>> pieceMap = updatePieceMapWithShapesRemaining(state->get_state_info().player1Shapes, state->get_state_info().player2Shapes);
+                    ScreenRenderer::drawUnplayedPieces(window, pieceMap);
                     window.display();
                     
                     validPlacement = true; 
                     break;
 
                 } 
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-                    state->change_turn();
-                    validPlacement = true; 
-                    turnComplete = true;
-                    break;
-                }
+                // if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { //this skip is broken since we are 
+                //     //changing the state and not the game tree therefore the state and tree will diverge.
+                //     // with the tree thinking the root (current state) is still the same turn and with the last move 
+                //     state->change_turn();
+                //     validPlacement = true; 
+                //     turnComplete = true;
+                //     break;
+                // }
 
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
                     singlePieceMap = rotateMatrix(singlePieceMap); // Rotate shape
@@ -109,7 +108,6 @@ Cathedral_state PlayerTurn::turn(sf::RenderWindow& window, sf::Event event, Cath
 
                             if(noCollision){
                                 game_tree->advance_tree(&move);
-                                state->play_move(&move);
                                 validPlacement = true;
                                 turnComplete = true;
                             
@@ -121,7 +119,6 @@ Cathedral_state PlayerTurn::turn(sf::RenderWindow& window, sf::Event event, Cath
         }
     }
 
-    return *state;
 }
 
 
@@ -159,7 +156,7 @@ foundFirst:
 }
 
 
-
+//converst mouse pos to top left cell where the shap would be place. accounting for first top left square
 std::pair<int, int> PlayerTurn::convertMousePosToGridCoords(const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld) {
     int gridX = mousePosWorld.x / GRID_SIZE;
     int gridY = mousePosWorld.y / GRID_SIZE;
@@ -187,36 +184,32 @@ std::pair<int, int> PlayerTurn::convertMousePosToGridCoords(const std::vector<st
 }
 
 
-int PlayerTurn::getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event,
-                                       const std::vector<std::vector<std::vector<int>>>& shapes)
+vector<vector<int>> PlayerTurn::getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event,
+                                      const vector<vector<int>>& pieceMap)
 {
-    std::string inputString;
     while (true) {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-                return -1; // signal cancel
+                return {}; // signal cancel
             }
 
-            if (event.type == sf::Event::TextEntered) {
-                if (event.text.unicode < 128) {
-                    char c = static_cast<char>(event.text.unicode);
-                    if (c == '\b') {
-                        if (!inputString.empty()) inputString.pop_back();
-                    } else if (c == '\r') {
-                        try {
-                            int selected = std::stoi(inputString);
-                            if (selected >= 0 && selected < shapes.size()) {
-                                return selected;
-                            } else {
-                                std::cout << "Invalid input. Try 0-" << shapes.size() - 1 << std::endl;
-                            }
-                        } catch (...) {
-                            std::cerr << "Invalid input.\n";
-                        }
-                        inputString.clear();
-                    } else if (isdigit(c)) {
-                        inputString += c;
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2i mousePosWindow = sf::Mouse::getPosition(window);
+                sf::Vector2f mousePosWorld = window.mapPixelToCoords(mousePosWindow);
+
+                int gridX = static_cast<int>(mousePosWorld.x) / GRID_SIZE;
+                int gridY = static_cast<int>(mousePosWorld.y) / GRID_SIZE;
+
+                if (gridY >= 0 && gridY < static_cast<int>(pieceMap.size()) &&
+                    gridX >= 0 && gridX < static_cast<int>(pieceMap[0].size())) {
+                    int pieceIndex = pieceMap[gridY][gridX];
+                    std::cout << "Selected piece index: " << pieceIndex 
+                              << " (Player min: " << _playerMin 
+                              << ", max: " << _playerMax << ")" << std::endl;
+                    if (pieceIndex <= _playerMax && pieceIndex >= _playerMin) {
+                        // Extract the shape matrix for the clicked piece
+                        return extractShapeFromPosition(pieceMap, gridX, gridY);
                     }
                 }
             }
@@ -227,7 +220,7 @@ int PlayerTurn::getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event,
 
 void PlayerTurn::renderTurnPreview(
     sf::RenderWindow& window,
-    Cathedral_state* state,
+    const Cathedral_state* state,
     const std::vector<std::vector<int>>& shape,
     const sf::Vector2f& mousePosWorld)
 {
@@ -237,9 +230,10 @@ void PlayerTurn::renderTurnPreview(
     sprite.setTexture(texture);
 
     window.clear();
-    drawBackground(window);
-    drawPieces(window, state);
-    drawBoard(window, state);
+    ScreenRenderer::drawBackground(window);
+    vector<vector<int>> pieceMap = updatePieceMapWithShapesRemaining(state->get_state_info().player1Shapes, state->get_state_info().player2Shapes);
+    ScreenRenderer::drawUnplayedPieces(window, pieceMap);
+    ScreenRenderer::drawBoard(window, state->get_state_info().board);
 
     auto posList = PieceManipulator::getPolyomioPositions(shape, mousePosWorld);
     for (const auto& pos : posList) {

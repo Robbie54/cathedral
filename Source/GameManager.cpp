@@ -1,5 +1,5 @@
 #include "Headers/GameManager.h"
-#include "Headers/DrawBoard.h"
+#include "Headers/ScreenRenderer.h"
 #include "Headers/MatrixUtility.h"
 #include "Headers/EvaluationMetric.h"
 #include <iostream>
@@ -7,21 +7,27 @@
 #include <future>
 using namespace std;
 
-GameManager::GameManager(sf::RenderWindow& win) : window(win), state(nullptr), game_tree(nullptr), winner(0) {
+GameManager::GameManager(sf::RenderWindow& win) : window(win), game_tree(nullptr), winner(0) {
     initialiseGame();
 }
 
 GameManager::~GameManager() {
-    delete state;
     delete game_tree;
 }
 
 void GameManager::run() {
     while (window.isOpen()) {
         window.clear();
-        drawBackground(window);
-        drawBoard(window, state);
-        drawPieces(window, state);
+        state = dynamic_cast<const Cathedral_state*>(game_tree->get_current_state());
+        if (!state) {
+            std::cerr << "Error: state is nullptr!" << std::endl;
+            // Handle error, skip drawing/evaluation, etc.
+            return;
+        }
+        ScreenRenderer::drawBackground(window);
+        ScreenRenderer::drawBoard(window, state->get_state_info().board);
+        vector<vector<int>> pieceMap = updatePieceMapWithShapesRemaining(state->get_state_info().player1Shapes, state->get_state_info().player2Shapes);
+        ScreenRenderer::drawUnplayedPieces(window, pieceMap);
         window.display();
 
         if (!processEvents()) break;
@@ -29,12 +35,11 @@ void GameManager::run() {
 }
 
 void GameManager::initialiseGame() {
-    vector<vector<int>> blankBoard(10, vector<int>(10, 0));
-    state = new Cathedral_state();
+    Cathedral_state* stateTemp = new Cathedral_state();
 
-    Cathedral_move m = addCathedral(blankBoard);
-    state->addShapeToBoard(&m);
-    game_tree = new MCTS_tree(new Cathedral_state(*state));
+    Cathedral_move m = generateRandomCathedralMove();
+    stateTemp->addShapeToBoard(&m);
+    game_tree = new MCTS_tree(new Cathedral_state(*stateTemp));
 }
 
 bool GameManager::processEvents() {
@@ -56,7 +61,7 @@ bool GameManager::processEvents() {
                     break;
                 case sf::Keyboard::P:
                     performPlayerMove();
-                    EvaluationMetric::evaluate(*state);
+                    EvaluationMetric::evaluate(*state); 
                     break;
                 case sf::Keyboard::R:
                     // rollout
@@ -77,7 +82,9 @@ bool GameManager::processEvents() {
 
 void GameManager::performPlayerMove() {
     PlayerTurn player;
-    player.turn(window, event, state, game_tree);
+    player.turn(window, event, game_tree);
+    state = dynamic_cast<const Cathedral_state*>(game_tree->get_current_state());
+
 }
 
 void GameManager::performMCTSMove() {
@@ -121,11 +128,9 @@ void GameManager::performMCTSMove() {
     if (best_child) {
         const Cathedral_move* move = (const Cathedral_move*)best_child->get_move();
         game_tree->advance_tree(move);
-        if (!state->play_move(move))
-            cerr << "Illegal move: " << move->sprint() << endl;
-        else
-            cout << "AI played: " << move->sprint() << endl;
     } else {
         cout << "No valid move found." << endl;
     }
+    state = dynamic_cast<const Cathedral_state*>(game_tree->get_current_state());
+
 }

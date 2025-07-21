@@ -1,8 +1,7 @@
 
 #include "Headers/Global.h"
-#include "Headers/Mcts.h"
+#include "Headers/CathedralState.h"
 #include "Headers/MatrixUtility.h"
-// #include "Headers/BoardUtility.h"
 
 #include <vector>
 #include <iostream>
@@ -280,7 +279,6 @@ double Cathedral_state::rollout() const{
     return evaluate_position(curState);
 }
 
-//play move might be deleting to many shapes per move
 bool Cathedral_state::play_move(const Cathedral_move *move){
    
     if (move == NULL || !legal_move(move)) {
@@ -560,60 +558,6 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
 
     cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE" <<endl;
 
-}
-
-
-
-//check if out of area doesn't owrk 
-vector<vector<int>> Cathedral_state::updatePieces(int player) {
-
-    int currentRow = 0, currentCol = 0;
-    int maxHeightInRow = 0; // To keep track of the tallest shape in the current row
-   
-    vector<vector<vector<int>>> shapes;
-
-    vector<vector<int>> resultMatrix((PIECE_SPACE_WIDTH), vector<int>(PIECE_SPACE_HEIGHT,0));
-
-    if(player == 1){
-        shapes = player1Shapes;
-    }
-    else if(player == 2) {
-        shapes = player2Shapes;
-    }
-    else{
-        cout << "Invalid player in update pieces " << endl;
-    }
-
-    for (const auto& shape : shapes) {
-        int shapeHeight = shape.size();
-        int shapeWidth = shape[0].size();
-        
-        // If the shape does not fit horizontally, move to the next row
-        if (currentCol + shapeWidth > PIECE_SPACE_WIDTH) {
-            currentRow += maxHeightInRow + 1; // Move to the next row with a gap
-            currentCol = 0; // Reset the column position
-            maxHeightInRow = 0; // Reset the max height for the new row
-        }
-
-        // If the shape does not fit vertically, stop placing shapes
-        if (currentRow + shapeHeight > PIECE_SPACE_HEIGHT) {
-            cout << "Shapes cannot fit within the given dimensions." << endl;
-            return resultMatrix;
-        }
-
-        // Place the shape in the result matrix
-        for (int i = 0; i < shapeHeight; ++i) {
-            for (int j = 0; j < shapeWidth; ++j) {
-                resultMatrix[currentRow + i][currentCol + j] = shape[i][j];
-            }
-        }
-
-        // Update current column and max height in the current row
-        currentCol += shapeWidth + 1; // Move to the next position with a gap
-        maxHeightInRow = max(maxHeightInRow, shapeHeight); // Update the max height if needed
-    }
-
-    return resultMatrix;
 }
 
 

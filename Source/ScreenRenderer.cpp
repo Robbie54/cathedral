@@ -1,13 +1,13 @@
 #include <SFML/Graphics.hpp>
 
 #include "Headers/Global.h"
-#include "Headers/DrawBoard.h"
-#include "Headers/Mcts.h"
-
+#include "Headers/ScreenRenderer.h"
+#include "Headers/CathedralState.h"
+#include "Headers/MatrixUtility.h"
 
 #include <utility>
 
-void drawBackground(sf::RenderWindow& window){
+void ScreenRenderer::drawBackground(sf::RenderWindow& window){
         sf::Sprite sprite;
 
         sf::Texture texture;
@@ -40,15 +40,13 @@ void drawBackground(sf::RenderWindow& window){
             }
     }
 
-void drawBoard(sf::RenderWindow& window, Cathedral_state* state, int posX, int posY){
+void ScreenRenderer::drawBoard(sf::RenderWindow& window, vector<vector<int>> board, int posX, int posY){
         sf::Sprite sprite;
 
         sf::Texture texture;
         texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
 
         sprite.setTexture(texture);
-
-        vector<vector<int>> board = state->get_state_info().board;
 
         for(int i = 0; i < board.size(); i++){
           for(int j = 0; j < board[i].size(); j++){
@@ -95,67 +93,37 @@ void drawBoard(sf::RenderWindow& window, Cathedral_state* state, int posX, int p
           
 
     }
-    
-
-
-
-void drawPieces(sf::RenderWindow& window, Cathedral_state* state){ 
+  
+void ScreenRenderer::drawUnplayedPieces(sf::RenderWindow& window, vector<vector<int>> pieceMap){ 
 
         sf::Texture texture;
         texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
-        
-        int player = 1; //corresponds to png positions
-        
+                
         sf::Sprite sprite;
         sprite.setTexture(texture);
 
-        vector<vector<int>> player1Pieces = state->updatePieces(1);
-        vector<vector<int>> player2Pieces = state->updatePieces(2);
+          for(int row = 0; row < pieceMap.size(); row++){
+              for(int column = 0; column < pieceMap[row].size(); column++){
+                  if(pieceMap[row][column] == 0) {
+                      continue; 
+                  }
 
-        for(int row = 0; row < player1Pieces.size(); row++){
-            for(int column = 0; column < player1Pieces[row].size(); column++){
-                 if(player1Pieces[row][column] == 0) {
-                    continue; 
-                }
-                 
-                else { 
-                        
-                        sprite.setPosition(static_cast<float>(GRID_SIZE * (column + 1)), static_cast<float>(GRID_SIZE * (row+1)));
-                        sprite.setTextureRect(sf::IntRect(GRID_SIZE * player, 0, GRID_SIZE, GRID_SIZE));
-                        
-                        window.draw(sprite);
-                }
-                
-            }
-        }
+                      int playerTexture = 1;
+                      if(pieceMap[row][column] >= player2Min) {
+                          playerTexture = 2;
+                      }
+                      sprite.setPosition(static_cast<float>(GRID_SIZE * column), static_cast<float>(GRID_SIZE * (row+1)));
+                      sprite.setTextureRect(sf::IntRect(GRID_SIZE * playerTexture, 0, GRID_SIZE, GRID_SIZE));
+                      window.draw(sprite);                          
+                  }
 
-
-        //board 
-
-
-        //player 2
-      player = 2;
-        for(int row = 0; row < player2Pieces.size(); row++){
-          for(int column = 0; column < player2Pieces[row].size(); column++){
-                if(player2Pieces[row][column] == 0) {
-                  continue; 
+                  
               }
-                
-              else { 
-                   
-                      sprite.setPosition(static_cast<float>(GRID_SIZE * (column +2) + GRID_SIZE*maxCol), static_cast<float>(GRID_SIZE * (row+1)));
-                      sprite.setTextureRect(sf::IntRect(GRID_SIZE * player, 0, GRID_SIZE, GRID_SIZE));
-                      window.draw(sprite);
-                }
-                
-            }
-        }
+          
      
 }
-      
 
-
-void drawMove(sf::RenderWindow& window, Cathedral_move* move, int posX, int posY){
+void ScreenRenderer::drawMove(sf::RenderWindow& window, Cathedral_move* move, int posX, int posY){
     sf::Sprite sprite;
     sf::Texture texture;
     texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
@@ -177,4 +145,3 @@ void drawMove(sf::RenderWindow& window, Cathedral_move* move, int posX, int posY
 
       }
 }
-

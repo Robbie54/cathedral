@@ -1,6 +1,6 @@
 #pragma once
 // #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
-#include "Mcts.h"
+#include "CathedralState.h"
 //this class is for calculations that happen on the board 
 //possibly add an update board on map in matrix Utility class 
 

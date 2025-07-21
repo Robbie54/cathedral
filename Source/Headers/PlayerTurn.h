@@ -9,7 +9,7 @@
 class PlayerTurn {
 
 public:
-    Cathedral_state turn(sf::RenderWindow& window, sf::Event event, Cathedral_state* state, MCTS_tree *game_tree); //should just pass the move back not handle game tree here
+    void turn(sf::RenderWindow& window, sf::Event event, MCTS_tree *game_tree); //should just pass the move back not handle game tree here
 
 private:
     // Direction vectors for moving in the 4 cardinal directions (up, down, left, right)
@@ -26,8 +26,8 @@ private:
     //ensuring mouse is over shape
     std::pair<int, int> convertMousePosToGridCoords(const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld); 
 
-    int getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event, const std::vector<std::vector<std::vector<int>>>& shapes);
-    void renderTurnPreview(sf::RenderWindow& window,Cathedral_state* state, const std::vector<std::vector<int>>& shape,const sf::Vector2f& mousePosWorld);
+    std::vector<std::vector<int>> getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event, const vector<vector<int>>& pieceMap);
+    void renderTurnPreview(sf::RenderWindow& window, const Cathedral_state* state, const std::vector<std::vector<int>>& shape,const sf::Vector2f& mousePosWorld);
 };
 
 

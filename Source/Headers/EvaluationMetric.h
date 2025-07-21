@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
-#include "Mcts.h"
+#include "CathedralState.h"
 
 struct UnplayableInfo {
     int count;
