@@ -9,6 +9,7 @@ public:
     static void drawBoard(sf::RenderWindow& window, vector<vector<int>> board, int posX = minRow, int posY = minCol);
     static void drawUnplayedPieces(sf::RenderWindow& window, vector<vector<int>> pieceMap);
     static void drawMove(sf::RenderWindow& window, Cathedral_move* move, int posX, int posY);
-
+    static void drawTurnSymbol(sf::RenderWindow& window, int player);
+    static void drawSquareClicked(sf::RenderWindow& window, int gridX, int gridY);
 };
 

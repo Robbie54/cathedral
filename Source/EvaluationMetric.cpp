@@ -5,6 +5,18 @@
 #include <iostream>
 
 double EvaluationMetric::evaluate(const Cathedral_state& state) {
+    // Safety check to ensure state is valid
+    try {
+        const auto& board = state.get_state_info().board;
+        if (board.empty() || board[0].empty()) {
+            std::cerr << "Error: Invalid board state in evaluation" << std::endl;
+            return 0.0;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error accessing state info: " << e.what() << std::endl;
+        return 0.0;
+    }
+
     int freeSpaces = countFreeSpaces(state);
     int playerTerritory = countPlayerTerritory(state);
     int enemyTerritory = countEnemyTerritory(state);

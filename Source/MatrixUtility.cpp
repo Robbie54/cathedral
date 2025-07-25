@@ -113,16 +113,17 @@ Cathedral_move generateRandomCathedralMove() {
 
 vector<vector<int>> updatePieceMapWithShapesRemaining(std::vector<std::vector<std::vector<int>>> shapeList, std::vector<std::vector<std::vector<int>>> shapeList2) {
 
-    vector<vector<int>> shapeListFull; 
-
     int currentRow = 0, currentCol = 0;
     int maxHeightInRow = 0; // To keep track of the tallest shape in the current row
    
-    vector<vector<vector<int>>> shapes = shapeList;
-
     vector<vector<int>> resultMatrix((PIECE_SPACE_WIDTH), vector<int>(PIECE_SPACE_HEIGHT,0));
     
-    shapeListFull = updateIndividualPlayerPieceMap(shapeList);
+    vector<vector<int>> shapeListFull = updateIndividualPlayerPieceMap(shapeList);
+    vector<vector<int>> shapeListFull2 = updateIndividualPlayerPieceMap(shapeList2);
+
+    // Add empty row at the beginning of both maps (shifts everything down by 1)
+    shapeListFull.insert(shapeListFull.begin(), vector<int>(shapeListFull[0].size(), 0));
+    shapeListFull2.insert(shapeListFull2.begin(), vector<int>(shapeListFull2[0].size(), 0));
 
     // Shift shapeListFull one column to the right
     for (auto& row : shapeListFull) {
@@ -134,7 +135,6 @@ vector<vector<int>> updatePieceMapWithShapesRemaining(std::vector<std::vector<st
     }
 
     // Generate the matrix for shapeList2
-    vector<vector<int>> shapeListFull2 = updateIndividualPlayerPieceMap(shapeList2);
 
     // Find the maximum number of rows between the two matrices
     int maxRows = std::max(shapeListFull.size(), shapeListFull2.size());

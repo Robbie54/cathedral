@@ -112,7 +112,7 @@ void ScreenRenderer::drawUnplayedPieces(sf::RenderWindow& window, vector<vector<
                       if(pieceMap[row][column] >= player2Min) {
                           playerTexture = 2;
                       }
-                      sprite.setPosition(static_cast<float>(GRID_SIZE * column), static_cast<float>(GRID_SIZE * (row+1)));
+                      sprite.setPosition(static_cast<float>(GRID_SIZE * column), static_cast<float>(GRID_SIZE * (row)));
                       sprite.setTextureRect(sf::IntRect(GRID_SIZE * playerTexture, 0, GRID_SIZE, GRID_SIZE));
                       window.draw(sprite);                          
                   }
@@ -144,4 +144,41 @@ void ScreenRenderer::drawMove(sf::RenderWindow& window, Cathedral_move* move, in
         }
 
       }
+}
+
+void ScreenRenderer::drawTurnSymbol(sf::RenderWindow& window, int player){
+  sf::Font font;
+  if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")) {
+    // Handle error, or return
+    return;
+  }
+
+  
+
+  sf::Text text;
+  text.setFont(font);
+  text.setCharacterSize(12);
+  text.setFillColor(sf::Color::White);
+  if(player == 1){
+    text.setString("Green's Turn");
+  }
+  else {
+    text.setString("Red's Turn");
+  }
+
+  // Position at (minCol * GRID_SIZE, maxRow * GRID_SIZE)
+  text.setPosition(static_cast<float>(minCol * GRID_SIZE), static_cast<float>(32 + (maxRow * GRID_SIZE)));
+
+  window.draw(text);
+}
+
+void ScreenRenderer::drawSquareClicked(sf::RenderWindow& window, int gridX, int gridY){
+  sf::Texture texture;
+  texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
+
+  sf::Sprite sprite;
+  sprite.setTexture(texture);
+  sprite.setTextureRect(sf::IntRect(GRID_SIZE * 3,0, GRID_SIZE, GRID_SIZE));
+  sprite.setPosition(static_cast<float>(gridX * GRID_SIZE), static_cast<float>(gridY * GRID_SIZE));
+  window.draw(sprite);
 }

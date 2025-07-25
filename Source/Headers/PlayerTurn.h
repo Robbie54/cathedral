@@ -4,41 +4,28 @@
 #include "../../MonteCarloTreeSearch-main/mcts/include/mcts.h"
 #include <vector>
 
-
-
 class PlayerTurn {
-
 public:
-    void turn(sf::RenderWindow& window, sf::Event event, MCTS_tree *game_tree); //should just pass the move back not handle game tree here
+    // Static utility methods for piece manipulation
+    static std::pair<int, int> convertMousePosToGridCoords(
+        const std::vector<std::vector<int>>& shape, 
+        const sf::Vector2f& mousePosWorld);
+    
+    static std::vector<std::vector<int>> extractShapeFromPosition(
+        const std::vector<std::vector<int>>& pieceMap, 
+        int gridX, int gridY);
 
 private:
-    // Direction vectors for moving in the 4 cardinal directions (up, down, left, right)
-    const std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
-    int _player; 
-    int _playerMin;
-    int _playerMax;
-
-    // To store the positions of the piece that is being moved incase of cancel 
-    std::vector<std::pair<int, int>> positions;
-
-
-    //ensuring mouse is over shape
-    std::pair<int, int> convertMousePosToGridCoords(const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld); 
-
-    std::vector<std::vector<int>> getUserSelectedPiece(sf::RenderWindow& window, sf::Event& event, const vector<vector<int>>& pieceMap);
-    void renderTurnPreview(sf::RenderWindow& window, const Cathedral_state* state, const std::vector<std::vector<int>>& shape,const sf::Vector2f& mousePosWorld);
+    static int _player;
+    static int _playerMin;
+    static int _playerMax;
 };
-
-
 
 class PieceManipulator {
 public:
-    
-    static std::vector<sf::Vector2f> getPolyomioPositions(const std::vector<std::vector<int>>& shape, const sf::Vector2f& mousePosWorld);
-
-private:
-
+    static std::vector<sf::Vector2f> getPolyomioPositions(
+        const std::vector<std::vector<int>>& shape,
+        const sf::Vector2f& mousePosWorld);
 };
 
 
