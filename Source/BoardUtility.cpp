@@ -8,18 +8,18 @@
 #include <boost/functional/hash.hpp>
 
 
-#include "Headers/global.h"
-#include "Headers/board_utility.h"
-#include "Headers/matrix_utility.h"
-#include "Headers/player_turn.h"
+#include "Headers/Global.h"
+#include "Headers/BoardUtility.h"
+#include "Headers/MatrixUtility.h"
+#include "Headers/PlayerTurn.h"
 
-#include "Headers/mcts.h"
+#include "Headers/CathedralState.h"
 
 
 
 using namespace std;
 
-bool board_utility::checkIfCreatingTerritoryFirstTurn(std::vector<std::vector<int>>& board, const Cathedral_move *move) {
+bool BoardUtility::checkIfCreatingTerritoryFirstTurn(std::vector<std::vector<int>>& board, const Cathedral_move *move) {
     
     bool valid;
     
@@ -75,7 +75,7 @@ bool board_utility::checkIfCreatingTerritoryFirstTurn(std::vector<std::vector<in
 }
 
 
-bool board_utility::checkIfPositionIsTerritory(int x, int y, std::vector<std::vector<bool>>& visited){
+bool BoardUtility::checkIfPositionIsTerritory(int x, int y, std::vector<std::vector<bool>>& visited){
     // Check bounds
     if (y < 0 || y >= rows || x < 0 || x >= cols) {
         return true; // Reached the edge, valid
@@ -130,7 +130,7 @@ bool board_utility::checkIfPositionIsTerritory(int x, int y, std::vector<std::ve
 
 
 
-bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const Cathedral_move *move) {
+bool BoardUtility::checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const Cathedral_move *move) {
     bool valid;
     
     vector<pair<int,int>> positionsToCheck = positionsAroundShape(move->shape); //not sure which is X or Y 
@@ -188,7 +188,7 @@ bool board_utility::checkIfCreatingTerritory(std::vector<std::vector<int>>& boar
 
 
 
-void board_utility::addShapeBack(std::vector<std::vector<int>>& map){
+void BoardUtility::addShapeBack(std::vector<std::vector<int>>& map){
     if(pieceNum == 0 ){
         cout << "pieceNum is 0";
         return;
@@ -205,7 +205,7 @@ void board_utility::addShapeBack(std::vector<std::vector<int>>& map){
 
 
 
-std::vector<std::pair<int, int>> board_utility::positionsAroundShape(const std::vector<std::vector<int>>& shape) {
+std::vector<std::pair<int, int>> BoardUtility::positionsAroundShape(const std::vector<std::vector<int>>& shape) {
     std::vector<std::pair<int, int>> positions;
     // Find the topmost and leftmost square in the shape matrix
     int topmostX = -1, topmostY = -1;
@@ -254,7 +254,7 @@ std::vector<std::pair<int, int>> board_utility::positionsAroundShape(const std::
 }
 
 
-bool board_utility::checkPositionForPieceRemoval(int x, int y, std::vector<std::vector<bool>>& visited, int& pieceInside) {
+bool BoardUtility::checkPositionForPieceRemoval(int x, int y, std::vector<std::vector<bool>>& visited, int& pieceInside) {
     // Check bounds
     if (y < 0 || y >= rows || x < 0 || x >= cols) {
         return true; // Reached the edge, valid
@@ -325,7 +325,7 @@ bool board_utility::checkPositionForPieceRemoval(int x, int y, std::vector<std::
 
 
 
-bool board_utility::checkNotOpponentsTeritory(std::vector<std::vector<int>> board, const sf::Vector2f& mousePosWorld) {
+bool BoardUtility::checkNotOpponentsTeritory(std::vector<std::vector<int>> board, const sf::Vector2f& mousePosWorld) {
     bool valid = true;
     _board = board; 
 
@@ -347,7 +347,7 @@ bool board_utility::checkNotOpponentsTeritory(std::vector<std::vector<int>> boar
 
 
 
-bool board_utility::checkPosition(int x, int y, std::vector<std::vector<bool>>& visited) {
+bool BoardUtility::checkPosition(int x, int y, std::vector<std::vector<bool>>& visited) {
     // Check bounds
     if (y < 0 || y >= rows || x < 0 || x >= cols) {
         return true; // Reached the edge, valid

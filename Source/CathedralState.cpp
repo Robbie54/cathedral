@@ -1,8 +1,7 @@
 
-#include "Headers/global.h"
-#include "Headers/mcts.h"
-#include "Headers/matrix_utility.h"
-// #include "Headers/board_utility.h"
+#include "Headers/Global.h"
+#include "Headers/CathedralState.h"
+#include "Headers/MatrixUtility.h"
 
 #include <vector>
 #include <iostream>
@@ -15,53 +14,6 @@ default_random_engine Cathedral_state::generator = default_random_engine(time(NU
 
 using namespace std;
 
-// std::vector<std::vector<std::vector<int>>> shapeFullList{  
-//     {{1}}, //Tavern
-//     {{1}},
-//     {{1, 1}}, //Stable
-//     {{1, 1}},
-//     {{1, 1},{0,1}}, //Inn
-//     {{1,1},{0,1}},
-//     {{1,1,1}}, //Bridge
-//     {{1, 1},{1,1}}, //Square
-//     {{1, 1,1},{0,1,0}}, //Manor
-//     {{0, 1,1},{1,1,0}}, //Abbey
-//     {{1, 1,0},{0,1,1}, {0,1,0}}, //Academy
-//     {{0, 1,0},{1,1,1}, {0,1,0}}, //Infirmary 
-//     {{1, 1,1},{1,0,1}}, //Castle
-//     {{0, 1,1},{1,1,0},{1,0,0}}}; //Tower
-
-std::vector<std::vector<std::vector<int>>> shapeFullListPOne{  
-    // {{2}}, //Tavern
-    // {{3}},
-    // {{4, 4}}, //Stable
-    // {{5, 5}},
-    // {{6, 6},{0,6}}, //Inn
-    // {{7,7},{0,7}},
-    {{8,8,8}}, //Bridge
-    {{9, 9},{9,9}}, //Square
-    {{10, 10,10},{0,10,0}}, //Manor
-    {{0, 11,11},{11,11,0}}, //Abbey
-    {{12, 12,0},{0,12,12}, {0,12,0}}, //Academy
-    {{0, 13,0},{13,13,13}, {0,13,0}}, //Infirmary 
-    {{14, 14,14},{14,0,14}}, //Castle
-    {{0, 15,15},{15,15,0},{15,0,0}}}; //Tower
-
-std::vector<std::vector<std::vector<int>>> shapeFullListPTwo{  
-    // {{26}}, //Tavern
-    // {{27}}, //Tavern2
-    // {{28, 28}}, //Stable
-    // {{29, 29}}, //Stable2
-    // {{30, 30},{0,30}}, //Inn
-    // {{31,31},{0,31}}, //Inn2
-    {{32,32,32}}, //Bridge
-    {{33, 33},{33,33}}, //Square
-    {{34, 34,34},{0,34,0}}, //Manor
-    {{0, 35,35},{35,35,0}}, //Abbey
-    {{36, 36,0},{0,36,36}, {0,36,0}}, //Academy
-    {{0, 37,0},{37,37,37}, {0,37,0}}, //Infirmary 
-    {{38, 38,38},{38,0,38}}, //Castle
-    {{0, 39,39},{39,39,0},{39,0,0}}}; //Tower
 
 
 
@@ -327,7 +279,6 @@ double Cathedral_state::rollout() const{
     return evaluate_position(curState);
 }
 
-//play move might be deleting to many shapes per move
 bool Cathedral_state::play_move(const Cathedral_move *move){
    
     if (move == NULL || !legal_move(move)) {
@@ -372,7 +323,7 @@ bool Cathedral_state::play_move(const Cathedral_move *move){
     else {
         cout << "Error with turn in play move " << endl;
     }
-        // board_utility b(turn, board); 
+        // BoardUtility b(turn, board); 
         int t = false;  
 
         if(player1Shapes.size() >= shapeFullListPOne.size() || player2Shapes.size() >= shapeFullListPTwo.size()){
@@ -607,60 +558,6 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
 
     cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE" <<endl;
 
-}
-
-
-
-//check if out of area doesn't owrk 
-vector<vector<int>> Cathedral_state::updatePieces(int player) {
-
-    int currentRow = 0, currentCol = 0;
-    int maxHeightInRow = 0; // To keep track of the tallest shape in the current row
-   
-    vector<vector<vector<int>>> shapes;
-
-    vector<vector<int>> resultMatrix((PIECE_SPACE_WIDTH), vector<int>(PIECE_SPACE_HEIGHT,0));
-
-    if(player == 1){
-        shapes = player1Shapes;
-    }
-    else if(player == 2) {
-        shapes = player2Shapes;
-    }
-    else{
-        cout << "Invalid player in update pieces " << endl;
-    }
-
-    for (const auto& shape : shapes) {
-        int shapeHeight = shape.size();
-        int shapeWidth = shape[0].size();
-        
-        // If the shape does not fit horizontally, move to the next row
-        if (currentCol + shapeWidth > PIECE_SPACE_WIDTH) {
-            currentRow += maxHeightInRow + 1; // Move to the next row with a gap
-            currentCol = 0; // Reset the column position
-            maxHeightInRow = 0; // Reset the max height for the new row
-        }
-
-        // If the shape does not fit vertically, stop placing shapes
-        if (currentRow + shapeHeight > PIECE_SPACE_HEIGHT) {
-            cout << "Shapes cannot fit within the given dimensions." << endl;
-            return resultMatrix;
-        }
-
-        // Place the shape in the result matrix
-        for (int i = 0; i < shapeHeight; ++i) {
-            for (int j = 0; j < shapeWidth; ++j) {
-                resultMatrix[currentRow + i][currentCol + j] = shape[i][j];
-            }
-        }
-
-        // Update current column and max height in the current row
-        currentCol += shapeWidth + 1; // Move to the next position with a gap
-        maxHeightInRow = max(maxHeightInRow, shapeHeight); // Update the max height if needed
-    }
-
-    return resultMatrix;
 }
 
 

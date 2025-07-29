@@ -1,7 +1,6 @@
 #pragma once 
 
 #include <vector>
-// #include <iostream>
 #include <utility>
 #include <random>
 
@@ -17,9 +16,8 @@ struct CathedralStateInfo {
     
 };
 
-
 struct Cathedral_move : public MCTS_move {
-    int row,col; //top left 
+    int row,col; //top left position of the shape/piece map
     std::vector<std::vector<int>> shape; //single piece map 
 
     Cathedral_move(int r, int c, std::vector<std::vector<int>> s)
@@ -100,6 +98,7 @@ public:
     double rollout() const override;                        // the rollout simulation in MCTS
     bool is_terminal() const override; 
     void print() const override; 
+    //virtual of mcts 
     bool player1_turn() const override {return turn == 1;} //return true if 1 
 
     bool legal_move(const Cathedral_move *move) const;
@@ -112,9 +111,6 @@ public:
      CathedralStateInfo get_state_info() const {
         return { board, winner, turn, player1Shapes, player2Shapes };
     }
-
-    vector<vector<int>> updatePieces(int player);
-
     
     int containsInt(const std::vector<std::vector<std::vector<int>>>& vec, int target);
     void addShapeToBoard(const Cathedral_move *move);

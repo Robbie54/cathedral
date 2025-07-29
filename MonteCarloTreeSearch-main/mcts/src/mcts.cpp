@@ -318,8 +318,9 @@ void MCTS_node::print_stats_cathedral() const {
         window2.setPosition(sf::Vector2i(100, 700));
         window2.clear();
         for(int i = 0; i < movesVec.size(); i++){
-            drawBoard(window2, static_cast<Cathedral_state*>(state), 0 ,i*(BOARD_SIZE+1));
-            drawMove(window2, movesVec[i], 0, i*(BOARD_SIZE+1));
+            auto stated = static_cast<Cathedral_state*>(state); //yuck lol
+            ScreenRenderer::drawBoard(window2, stated->get_state_info().board, 0 ,i*(BOARD_SIZE+1));
+            ScreenRenderer::drawMove(window2, movesVec[i], 0, i*(BOARD_SIZE+1));
         }
 
         window2.display();
