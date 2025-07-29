@@ -2,6 +2,7 @@
 #include "Headers/Global.h"
 #include "Headers/CathedralState.h"
 #include "Headers/MatrixUtility.h"
+#include "Headers/BoardUtility.h"
 
 #include <vector>
 #include <iostream>
@@ -323,21 +324,23 @@ bool Cathedral_state::play_move(const Cathedral_move *move){
     else {
         cout << "Error with turn in play move " << endl;
     }
-        // BoardUtility b(turn, board); 
-        int t = false;  
-
-        if(player1Shapes.size() >= shapeFullListPOne.size() || player2Shapes.size() >= shapeFullListPTwo.size()){
-            firstTurn = true;
-            // cout << "first  turn move is col: " << move->col << " row :" << move->row << endl;
-           t = checkIfCreatingTerritory(move);
+        // Use BoardUtility for territory checking
+        BoardUtility boardUtil(turn , board);
+        bool territoryCreated = false;
+        if (player1Shapes.size() < shapeFullListPOne.size() - 1 || player2Shapes.size() < shapeFullListPTwo.size() - 1){
+            boardUtil.setTerritoryInfo(playerTerritory, opponentTerritory);
+            territoryCreated = boardUtil.checkIfCreatingTerritory(move);
         }
-        else {
-            firstTurn = false;
-            t = checkIfCreatingTerritory(move); 
-        }
-
-        if(t == true){
-            // cout << "Territory created! " << endl;
+        
+        if (territoryCreated) {
+            // Get the updated board from BoardUtility
+            board = boardUtil.getBoard();
+            
+            // Handle piece removal if needed
+            int pieceToRemove = boardUtil.getPieceNumToRemove();
+            if (pieceToRemove != -1 && pieceToRemove != 1) {
+                addShapeToPlayerShapes(pieceToRemove);
+            }
         }
 
         winner = check_winner();
@@ -557,173 +560,9 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
     }
 
     cout << "NO RANDOM MOVE IN PICK SEMIRANDOM MOVE" <<endl;
-
+    return nullptr;
 }
 
-
-
-bool Cathedral_state::checkIfCreatingTerritory(const Cathedral_move *move) {
-    
-    bool valid;
-    
-    vector<pair<int,int>> positionsToCheck = positionsAroundShape(move->shape); //not sure which is X or Y 
-
-    // cout << "Checking at " << gridCol << " " << gridRow << endl;
-    for (auto pos : positionsToCheck){
-        int boardRow = move->row + pos.first; //Y
-        int boardCol = move->col + pos.second; //X
-        
-
-        if(boardCol < 0 || boardCol >= board[0].size() || boardRow < 0 || boardRow >= board.size()){
-            continue; 
-        }
-
-        if(board[boardRow][boardCol] >= playerMin && board[boardRow][boardCol] <= playerMax){
-            continue; 
-        }
-
-        // cout << "shape is at col: " << move->col << " row: " << move->row << " checking at col " << boardCol << " row " << boardRow << " index at board " << board[move->row][move->col] << endl;
-
-        std::vector<std::vector<bool>> visited(board.size(), std::vector<bool>(board[0].size(), false));
-        pieceNumToRemove = -1;
-        bool r = checkIfPositionIsNowPlayersTerritory(boardRow, boardCol, visited); 
-        if(r == true){ 
-        
-            // cout << "position is territory at col: " << boardCol << " row:" << boardRow << " Board index is: " << board[boardRow][boardCol] << endl;
-         
-            changeSpaceToPlayersTerritory(boardRow, boardCol);
-            if(pieceNumToRemove != -1 && pieceNumToRemove != 1){
-                addShapeToPlayerShapes(pieceNumToRemove);
-            }
-            
-            return true;
-           
-        }
-
-    }
-
-
-   
-    return false;
-}
-
-
-bool Cathedral_state::checkIfPositionIsNowPlayersTerritory(int row, int col, std::vector<std::vector<bool>>& visited){
-    // Check bounds
-    if (row < 0 || row >= board.size() || col < 0 || col >= board[0].size()) { 
-        return true; // Reached the edge, valid
-    }
-
-    // If already visited, skip this cell
-    if (visited[row][col]) { 
-        return true;
-    }
-
-    // Mark the cell as visited
-    visited[row][col] = true;
-
-    if (board[row][col] >= playerMin && board[row][col] <= playerMax || board[row][col] == playerTerritory) {
-        return true;
-    }
-
-    if ((board[row][col] >= opponentMin && board[row][col] <= opponentMax) || board[row][col] == cathedral) { 
-        if(firstTurn){
-            return false;
-        }     
-
-        if(pieceNumToRemove == -1 || board[row][col] == pieceNumToRemove){
-           pieceNumToRemove = board[row][col];
-        }
-        
-        else {
-            return false;
-        }
-
-    }
-
-    if (board[row][col] == 0 || board[row][col] == cathedral || (board[row][col] >= opponentMin && board[row][col] <= opponentMax) || board[row][col] == opponentTerritory) { 
-  
-        // Check all adjacent cells (including diagonals)
-        bool valid = true;
-        valid &= checkIfPositionIsNowPlayersTerritory(row, col + 1, visited); // Right
-        if (!valid) return false;
-        valid &= checkIfPositionIsNowPlayersTerritory(row, col -1, visited); // Left
-        if (!valid) return false;
-        valid &= checkIfPositionIsNowPlayersTerritory(row + 1, col, visited); // Down
-        if (!valid) return false;
-        valid &= checkIfPositionIsNowPlayersTerritory(row - 1, col, visited); // Up
-        if (!valid) return false;
-        valid &= checkIfPositionIsNowPlayersTerritory(row +1, col + 1, visited); // Bottom-Right (Diagonal)
-        if (!valid) return false;
-        valid &= checkIfPositionIsNowPlayersTerritory(row - 1, col - 1, visited); // Top-Left (Diagonal)
-        if (!valid) return false;
-        valid &= checkIfPositionIsNowPlayersTerritory(row + 1, col - 1, visited); // Top-Right (Diagonal)
-        if (!valid) return false;
-        valid &= checkIfPositionIsNowPlayersTerritory(row - 1, col + 1, visited); // Bottom-Left (Diagonal)
-        if (!valid) return false;
-
-
-        return valid;
-    }
-
-    return false;
-}
-
-std::vector<std::pair<int, int>> Cathedral_state::positionsAroundShape(const std::vector<std::vector<int>>& shape) {
-    std::vector<std::pair<int, int>> positions;
-    // Compute positions around the shape
-   for (int i = 0; i < shape.size(); ++i) {
-        for (int j = 0; j < shape[i].size(); ++j) {
-            if (shape[i][j] != 0) {
-                if (i == 0 || shape[i - 1][j] == 0) {
-                    positions.push_back({i - 1, j});
-                }
-                if (i == shape.size() - 1 || shape[i + 1][j] == 0) {
-                    positions.push_back({i + 1, j});
-                }
-                if (j == 0 || shape[i][j - 1] == 0) {
-                    positions.push_back({i, j - 1});
-                }
-                if (j == shape[i].size() - 1 || shape[i][j + 1] == 0) {
-                    positions.push_back({i, j + 1});
-                }
-                
-
-            }
-        }
-    }
-
-    return positions;
-}
-
-
-void Cathedral_state::changeSpaceToPlayersTerritory(int row, int col){
-    
-    // Boundary and condition check
-    if (row < 0 || col < 0 || row >= board.size() || col >= board[0].size() || board[row][col] != 0 && board[row][col] != pieceNumToRemove && board[row][col] != opponentTerritory) { //also  add if its the piece num being removed 
-        return;
-    }
-    
-   if(turn == 1){
-    board[row][col] = player1Territory;
-   }
-   else if(turn == 2){
-    board[row][col] = player2Territory;
-   }
-   else { 
-        cout << "turn broken trying to change space to territory? " << endl;
-   }
-    
-
-    
-    // Recursively call for all adjacent positions
-    for (const auto& dir : directions) {
-        int newRow = row + dir.first;
-        int newCol = col + dir.second;
-        changeSpaceToPlayersTerritory(newRow, newCol);
-    }
-    
-}
 
 void Cathedral_state::addShapeToPlayerShapes(int pieceNum){
     int i = 0;

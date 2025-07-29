@@ -11,7 +11,7 @@ find_package(SFML 2.5 REQUIRED graphics window system)
 # Include the directories for SFML
 include_directories(${SFML_INCLUDE_DIR})
 
-add_executable(Main Source/Main.cpp Source/GameState.cpp Source/ScreenRenderer.cpp Source/PlayerTurn.cpp Source/CathedralState.cpp Source/EvaluationMetric.cpp Source/GameManager.cpp Source/MatrixUtility.cpp MonteCarloTreeSearch-main/mcts/src/mcts.cpp MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp
+add_executable(Main Source/Main.cpp Source/GameState.cpp Source/ScreenRenderer.cpp Source/PlayerTurn.cpp Source/CathedralState.cpp Source/EvaluationMetric.cpp Source/GameManager.cpp Source/MatrixUtility.cpp Source/BoardUtility.cpp MonteCarloTreeSearch-main/mcts/src/mcts.cpp MonteCarloTreeSearch-main/mcts/src/JobScheduler.cpp
 )
 
 target_link_libraries(Main sfml-graphics sfml-window sfml-system pthread)

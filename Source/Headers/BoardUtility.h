@@ -1,10 +1,8 @@
 #pragma once
+#include <SFML/Graphics.hpp>
 // #include "../../MonteCarloTreeSearch-main/mcts/include/state.h"
 #include "CathedralState.h"
-//this class is for calculations that happen on the board 
-//possibly add an update board on map in matrix Utility class 
 
-//will need mousePos, board, current shape being placed 
 class BoardUtility{
     public:
     BoardUtility(const int& currentPlayer, const std::vector<std::vector<int>>& board)
@@ -25,14 +23,32 @@ class BoardUtility{
     
 
     // checkTeritory
-    bool checkNotOpponentsTeritory(std::vector<std::vector<int>> matrix, const sf::Vector2f& mousePosWorld);
-
-    //for first move 
-    bool checkIfCreatingTerritoryFirstTurn(std::vector<std::vector<int>>& board, const Cathedral_move *move);
-
+    bool checkNotOpponentsTerritory(std::vector<std::vector<int>> matrix, const sf::Vector2f& mousePosWorld);
     
-    //to remove one piece
-    bool checkIfCreatingTerritory(std::vector<std::vector<int>>& board, const Cathedral_move *move);
+    // Territory checking (updated method)
+    bool checkIfCreatingTerritory(const Cathedral_move *move);
+    bool checkIfPositionIsNowPlayersTerritory(int row, int col, std::vector<std::vector<bool>>& visited, int& enclosedPieceCount);
+    
+    // Territory management
+    void setTerritoryInfo(int playerTerritory, int opponentTerritory);
+    void changeSpaceToPlayersTerritory(int row, int col);
+    
+    // Board access
+    const std::vector<std::vector<int>>& getBoard() const { return _board; }
+    int getPieceNumToRemove() const { return pieceNumToRemove; }
+    
+    // Debug visualization
+    void enableDebugVisualization(sf::RenderWindow* window) { debugWindow = window; debugMode = true; }
+    void disableDebugVisualization() { debugWindow = nullptr; debugMode = false; }
+    void drawVisitedPositions();  // Call this in render loop to show visited positions
+    
+    // Step-by-step flood fill visualization
+    void enableStepByStepMode() { stepByStepMode = true; currentFloodFillIndex = 0; }
+    void disableStepByStepMode() { stepByStepMode = false; allFloodFills.clear(); currentFloodFillIndex = 0; }
+    void nextFloodFill(); // Advance to next flood fill
+    bool hasMoreFloodFills() const { return currentFloodFillIndex < allFloodFills.size(); }
+    int getCurrentFloodFillIndex() const { return currentFloodFillIndex; }
+    int getTotalFloodFills() const { return allFloodFills.size(); }
 
     private:
         std::vector<std::vector<int>> _board;
@@ -49,6 +65,21 @@ class BoardUtility{
 
         std::vector<std::pair<int,int>> piecePosToRemove;
         int pieceNum;
+        
+        // Territory checking variables moved from CathedralState
+        int pieceNumToRemove;
+        bool firstTurn;
+        int _playerTerritory, _opponentTerritory;
+        
+        // Debug visualization
+        bool debugMode = false;
+        sf::RenderWindow* debugWindow = nullptr;
+        std::vector<std::pair<int, int>> visitedPositions;
+        
+        // Step-by-step flood fill visualization
+        bool stepByStepMode = false;
+        std::vector<std::vector<std::pair<int, int>>> allFloodFills; // Each flood fill's visited positions
+        int currentFloodFillIndex = 0;
 
         std::vector<std::pair<int, int>> positionsAroundShape(const std::vector<std::vector<int>>& shape);
 
@@ -57,9 +88,6 @@ class BoardUtility{
 
         //check position is not one enemy piece in territory
         bool checkPositionForPieceRemoval(int x, int y, std::vector<std::vector<bool>>& visited, int& pieceInside);
-        
-        //this is for first turn so not deleting cathedral
-        bool checkIfPositionIsTerritory(int x, int y, std::vector<std::vector<bool>>& visited);
 
 
         void addShapeBack(std::vector<std::vector<int>>& map);

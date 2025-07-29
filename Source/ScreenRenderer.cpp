@@ -178,7 +178,7 @@ void ScreenRenderer::drawSquareClicked(sf::RenderWindow& window, int gridX, int 
 
   sf::Sprite sprite;
   sprite.setTexture(texture);
-  sprite.setTextureRect(sf::IntRect(GRID_SIZE * 3,0, GRID_SIZE, GRID_SIZE));
+  sprite.setTextureRect(sf::IntRect(GRID_SIZE*2, GRID_SIZE, GRID_SIZE, GRID_SIZE));
   sprite.setPosition(static_cast<float>(gridX * GRID_SIZE), static_cast<float>(gridY * GRID_SIZE));
   window.draw(sprite);
 }
