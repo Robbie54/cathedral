@@ -3,6 +3,7 @@
 #include "Headers/MatrixUtility.h"
 #include "Headers/EvaluationMetric.h"
 #include "Headers/PlayerTurn.h"
+#include "Headers/BoardUtility.h"
 #include <iostream>
 #include <thread>
 #include <future>
@@ -51,6 +52,9 @@ void GameManager::initialiseGame() {
     std::cout << "R: Rotate selected piece" << std::endl;
     std::cout << "C: Cancel piece placement" << std::endl;
     std::cout << "M: Let MCTS make a move" << std::endl;
+    std::cout << "E: Evaluate current board state" << std::endl;
+    std::cout << "D: Toggle territory debug visualization" << std::endl;
+    std::cout << "T: Test territory checking with debug (enable D first)" << std::endl;
     std::cout << "E: Evaluate current position" << std::endl;
     std::cout << "===============================" << std::endl;
     std::cout << "Game started! Click on a piece to begin or press 'M' for MCTS turn" << std::endl;
@@ -138,6 +142,11 @@ void GameManager::render() {
             break;
     }
     
+    // Draw debug visualization if enabled
+    if (debugTerritoryMode && debugBoardUtil) {
+        debugBoardUtil->drawVisitedPositions();
+    }
+    
     window.display();
 }
 
@@ -180,6 +189,12 @@ void GameManager::handlePiecePlacement() {
         
         bool noCollision = state->legal_move(&move);
         if (noCollision) {
+            // If debug mode is enabled, test territory checking for the move that was just made
+            if (debugTerritoryMode) {
+                std::cout << "Debug: Testing territory for the move that was just placed..." << std::endl;
+                testTerritoryForMove(move);
+            }
+            
             game_tree->advance_tree(&move);
             selectedPiece.clear();
             currentGameState = GameState::PIECE_SELECTION;
@@ -220,6 +235,36 @@ void GameManager::handleKeyboard() {
             break;
         case sf::Keyboard::E:
             EvaluationMetric::evaluate(*state);
+            break;
+        case sf::Keyboard::D:
+            debugTerritoryMode = !debugTerritoryMode;
+            if (debugTerritoryMode) {
+                std::cout << "Territory debug visualization enabled - red squares will show visited positions during territory checking" << std::endl;
+            } else {
+                std::cout << "Territory debug visualization disabled" << std::endl;
+                debugBoardUtil.reset(); // Clear the debug BoardUtility
+                stepByStepFloodFillMode = false; // Reset step-by-step mode
+            }
+            break;
+        case sf::Keyboard::T:
+            if (debugTerritoryMode) {
+                testTerritoryDebug();
+            } else {
+                std::cout << "Enable debug mode first (press D), then press T to test territory checking" << std::endl;
+            }
+            break;
+        case sf::Keyboard::N:
+            if (debugTerritoryMode && stepByStepFloodFillMode && debugBoardUtil) {
+                if (debugBoardUtil->hasMoreFloodFills()) {
+                    debugBoardUtil->nextFloodFill();
+                } else {
+                    std::cout << "No more flood fills to display. Place a piece to generate new flood fills." << std::endl;
+                }
+            } else if (debugTerritoryMode && !stepByStepFloodFillMode) {
+                std::cout << "Step-by-step mode not enabled. Place a piece first to analyze territory." << std::endl;
+            } else {
+                std::cout << "Enable debug mode first (press D), then place a piece to analyze territory step-by-step." << std::endl;
+            }
             break;
         default:
             break;
@@ -315,4 +360,75 @@ bool GameManager::isValidPlayerPiece(int pieceIndex) const {
 
 int GameManager::getCurrentPlayer() const {
     return _player;
+}
+
+void GameManager::testTerritoryDebug() {
+    if (!state) {
+        std::cout << "No game state available for testing" << std::endl;
+        return;
+    }
+    
+    std::cout << "Testing territory checking with debug visualization..." << std::endl;
+    std::cout << "Creating a test move to check territory. Check the game window for red squares showing visited positions." << std::endl;
+    
+    // Get current board and player info
+    auto board = state->get_state_info().board;
+    int currentPlayer = state->get_state_info().turn;
+    int playerTerritory = (currentPlayer == 1) ? player1Territory : player2Territory;
+    int opponentTerritory = (currentPlayer == 1) ? player2Territory : player1Territory;
+    
+    // Create a BoardUtility instance with debug enabled
+    debugBoardUtil = std::make_unique<BoardUtility>(currentPlayer, board);
+    debugBoardUtil->setTerritoryInfo(playerTerritory, opponentTerritory);
+    debugBoardUtil->enableDebugVisualization(&window);
+    
+    // Create a simple test move (1x1 piece at center of board for testing)
+    std::vector<std::vector<int>> testShape = {{currentPlayer == 1 ? 2 : 26}}; // Simple 1x1 piece
+    Cathedral_move testMove(5, 5, testShape); // Place at position (5,5) which should be on the board
+    
+    std::cout << "Testing with move at position (5,5) for player " << currentPlayer << std::endl;
+    std::cout << "Using piece value: " << (currentPlayer == 1 ? 2 : 26) << std::endl;
+    
+    // Test territory checking - this will populate visitedPositions
+    bool territoryCreated = debugBoardUtil->checkIfCreatingTerritory(&testMove);
+    
+    std::cout << "Territory checking complete. Result: " << (territoryCreated ? "Territory created" : "No territory created") << std::endl;
+    
+    // Check if any positions were visited for debugging
+    std::cout << "Debug: Checking if positions were collected..." << std::endl;
+    std::cout << "Red squares in the game window show all positions visited during the flood-fill algorithm." << std::endl;
+    std::cout << "The visualization will persist until you disable debug mode (press D again)." << std::endl;
+}
+
+void GameManager::testTerritoryForMove(const Cathedral_move& move) {
+    if (!state) {
+        std::cout << "No game state available for testing" << std::endl;
+        return;
+    }
+    
+    std::cout << "Debug: Testing territory for actual move at position (" << move.row << ", " << move.col << ")" << std::endl;
+    
+    // Get current board and player info (before the move is applied)
+    auto board = state->get_state_info().board;
+    int currentPlayer = state->get_state_info().turn;
+    int playerTerritory = (currentPlayer == 1) ? player1Territory : player2Territory;
+    int opponentTerritory = (currentPlayer == 1) ? player2Territory : player1Territory;
+    
+    // Create a BoardUtility instance with debug enabled
+    debugBoardUtil = std::make_unique<BoardUtility>(currentPlayer, board);
+    debugBoardUtil->setTerritoryInfo(playerTerritory, opponentTerritory);
+    debugBoardUtil->enableDebugVisualization(&window);
+    debugBoardUtil->enableStepByStepMode(); // Enable step-by-step flood fill mode
+    stepByStepFloodFillMode = true;
+    
+    // Test territory checking for the actual move - this will populate individual flood fills
+    bool territoryCreated = debugBoardUtil->checkIfCreatingTerritory(&move);
+    
+    std::cout << "Debug: Territory checking complete for move. Result: " << (territoryCreated ? "Territory created" : "No territory created") << std::endl;
+    if (debugBoardUtil->getTotalFloodFills() > 0) {
+        std::cout << "Debug: Captured " << debugBoardUtil->getTotalFloodFills() << " flood fills. Press N to step through them!" << std::endl;
+        std::cout << "Debug: Currently showing flood fill 1/" << debugBoardUtil->getTotalFloodFills() << std::endl;
+    } else {
+        std::cout << "Debug: No flood fills were captured" << std::endl;
+    }
 }

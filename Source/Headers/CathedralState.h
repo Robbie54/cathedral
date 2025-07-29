@@ -61,8 +61,6 @@ private:
     int playerTerritory, opponentTerritory;
     
     const vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    bool firstTurn;
-    int pieceNumToRemove;
 
 
     Cathedral_move *pick_semirandom_move(Cathedral_state &s) const;
@@ -71,14 +69,6 @@ private:
     double evaluate_position(Cathedral_state &s) const;
 
     Cathedral_move *pickRandomMove(Cathedral_state &s) const;
-
-
-    //Territory stuff
-    bool checkIfCreatingTerritory(const Cathedral_move *move);
-    bool checkIfPositionIsNowPlayersTerritory(int row, int col, std::vector<std::vector<bool>>& visited);
-
-    std::vector<std::pair<int, int>> positionsAroundShape(const std::vector<std::vector<int>>& shape);
-    void changeSpaceToPlayersTerritory(int row, int col);
 
     void addShapeToPlayerShapes(int pieceNum);
 
@@ -126,22 +116,3 @@ public:
 
 
 };
-
-
-
-
-
-//things we have for heuristics
-//score 
-//if piece gets removed 
-//win/loss
-//
-
-
-//functions 
-//random move 
-    //maybe have a list of pieces to select 
-    //random rotate 
-//check winner
-    //slow to check board every move for valid plays 
-    //calculate score says who wins just need valid plays 

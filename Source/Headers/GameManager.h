@@ -1,8 +1,12 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 #include "CathedralState.h"
 #include "PlayerTurn.h"
+
+// Forward declaration
+class BoardUtility;
 
 class GameManager {
 public:
@@ -34,6 +38,8 @@ private:
     void performMCTSMove();
     bool isValidPlayerPiece(int pieceIndex) const;
     int getCurrentPlayer() const;
+    void testTerritoryDebug();  // Test territory checking with debug visualization
+    void testTerritoryForMove(const Cathedral_move& move);  // Test territory for a specific move
     
     // Core game objects
     sf::RenderWindow& window;
@@ -59,4 +65,9 @@ private:
     int _player;
     int _playerMin;
     int _playerMax;
+    
+    // Debug state
+    bool debugTerritoryMode = false;
+    std::unique_ptr<BoardUtility> debugBoardUtil;
+    bool stepByStepFloodFillMode = false;
 };
