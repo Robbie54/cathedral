@@ -4,16 +4,13 @@
 #include "Headers/ScreenRenderer.h"
 #include "Headers/CathedralState.h"
 #include "Headers/MatrixUtility.h"
+#include "Headers/ResourceManager.h"
 
 #include <utility>
 
 void ScreenRenderer::drawBackground(sf::RenderWindow& window){
         sf::Sprite sprite;
-
-        sf::Texture texture;
-        texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
-
-        sprite.setTexture(texture);
+        sprite.setTexture(ResourceManager::getInstance().getTexture("misc"));
       
           for (unsigned int a = 0; a < SCREEN_WIDTH; a++)
             {
@@ -43,10 +40,7 @@ void ScreenRenderer::drawBackground(sf::RenderWindow& window){
 void ScreenRenderer::drawBoard(sf::RenderWindow& window, vector<vector<int>> board, int posX, int posY){
         sf::Sprite sprite;
 
-        sf::Texture texture;
-        texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
-
-        sprite.setTexture(texture);
+        sprite.setTexture(ResourceManager::getInstance().getTexture("misc"));
 
         for(int i = 0; i < board.size(); i++){
           for(int j = 0; j < board[i].size(); j++){
@@ -96,11 +90,10 @@ void ScreenRenderer::drawBoard(sf::RenderWindow& window, vector<vector<int>> boa
   
 void ScreenRenderer::drawUnplayedPieces(sf::RenderWindow& window, vector<vector<int>> pieceMap){ 
 
-        sf::Texture texture;
-        texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
+      
                 
         sf::Sprite sprite;
-        sprite.setTexture(texture);
+        sprite.setTexture(ResourceManager::getInstance().getTexture("misc"));
 
           for(int row = 0; row < pieceMap.size(); row++){
               for(int column = 0; column < pieceMap[row].size(); column++){
@@ -125,10 +118,8 @@ void ScreenRenderer::drawUnplayedPieces(sf::RenderWindow& window, vector<vector<
 
 void ScreenRenderer::drawMove(sf::RenderWindow& window, Cathedral_move* move, int posX, int posY){
     sf::Sprite sprite;
-    sf::Texture texture;
-    texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
+    sprite.setTexture(ResourceManager::getInstance().getTexture("misc"));
 
-    sprite.setTexture(texture);
 
     for(int x = 0; x < move->shape.size(); x++){
       for(int y = 0; y < move->shape[0].size(); y++){
@@ -173,11 +164,8 @@ void ScreenRenderer::drawTurnSymbol(sf::RenderWindow& window, int player){
 }
 
 void ScreenRenderer::drawSquareClicked(sf::RenderWindow& window, int gridX, int gridY){
-  sf::Texture texture;
-  texture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
-
   sf::Sprite sprite;
-  sprite.setTexture(texture);
+  sprite.setTexture(ResourceManager::getInstance().getTexture("misc"));
   sprite.setTextureRect(sf::IntRect(GRID_SIZE*2, GRID_SIZE, GRID_SIZE, GRID_SIZE));
   sprite.setPosition(static_cast<float>(gridX * GRID_SIZE), static_cast<float>(gridY * GRID_SIZE));
   window.draw(sprite);

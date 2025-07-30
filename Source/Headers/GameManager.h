@@ -18,7 +18,6 @@ public:
 private:
     // Initialization
     void initialiseGame();
-    void loadResources();
     
     // Main game loop components
     void handleEvents();

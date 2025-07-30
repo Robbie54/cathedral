@@ -4,6 +4,7 @@
 #include "Headers/EvaluationMetric.h"
 #include "Headers/PlayerTurn.h"
 #include "Headers/BoardUtility.h"
+#include "Headers/ResourceManager.h"
 #include <iostream>
 #include <thread>
 #include <future>
@@ -11,17 +12,11 @@ using namespace std;
 
 GameManager::GameManager(sf::RenderWindow& win) : window(win), game_tree(nullptr), winner(0) {
     initialiseGame();
-    loadResources();
+    pieceSprite.setTexture(ResourceManager::getInstance().getTexture("misc"));
 }
 
 GameManager::~GameManager() {
     delete game_tree;
-}
-
-void GameManager::loadResources() {
-    // Load textures once at startup
-    pieceTexture.loadFromFile("/home/robbie/Desktop/capstone/cathedral/Source/Images/misc.png");
-    pieceSprite.setTexture(pieceTexture);
 }
 
 void GameManager::run() {
@@ -188,13 +183,7 @@ void GameManager::handlePiecePlacement() {
         Cathedral_move move(gridRow - minRow, gridCol - minCol, selectedPiece);
         
         bool noCollision = state->legal_move(&move);
-        if (noCollision) {
-            // If debug mode is enabled, test territory checking for the move that was just made
-            if (debugTerritoryMode) {
-                std::cout << "Debug: Testing territory for the move that was just placed..." << std::endl;
-                testTerritoryForMove(move);
-            }
-            
+        if (noCollision) {     
             game_tree->advance_tree(&move);
             selectedPiece.clear();
             currentGameState = GameState::PIECE_SELECTION;
@@ -283,7 +272,7 @@ void GameManager::renderPiecePlacement() {
         state->get_state_info().player1Shapes, 
         state->get_state_info().player2Shapes);
     ScreenRenderer::drawUnplayedPieces(window, pieceMap);
-    
+
     // Draw the piece preview at mouse position
     if (!selectedPiece.empty()) {
         auto posList = PieceManipulator::getPolyomioPositions(selectedPiece, mouseWorldPos);
