@@ -51,34 +51,6 @@ struct Cathedral_move : public MCTS_move {
 };
 
 class Cathedral_state : public MCTS_state {
-private:
-    std::vector<std::vector<int>> board;
-    int winner, turn;
-    std::vector<std::vector<std::vector<int>>> player1Shapes;
-    std::vector<std::vector<std::vector<int>>> player2Shapes;
-    int playerMin, playerMax;
-    int opponentMin, opponentMax;
-    int playerTerritory, opponentTerritory;
-    
-    const vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
-
-    Cathedral_move *pick_semirandom_move(Cathedral_state &s) const;
-
-    
-    double evaluate_position(Cathedral_state &s) const;
-
-    Cathedral_move *pickRandomMove(Cathedral_state &s) const;
-
-    void addShapeToPlayerShapes(int pieceNum);
-
-    //static so same across all states
-    static default_random_engine generator;
-
-    bool any_actions_to_try() const;
-
-    vector<Cathedral_move> movesVec; 
-
 public:
     Cathedral_state(); 
     Cathedral_state(const Cathedral_state &other);
@@ -108,11 +80,44 @@ public:
 
 
     void addMove(Cathedral_move m);
+
+private:
+    std::vector<std::vector<int>> board;
+    int winner, turn;
+    std::vector<std::vector<std::vector<int>>> player1Shapes;
+    std::vector<std::vector<std::vector<int>>> player2Shapes;
+    int playerMin, playerMax;
+    int opponentMin, opponentMax;
+    int playerTerritory, opponentTerritory;
     
-     
+    const vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
 
+    Cathedral_move *pick_semirandom_move(Cathedral_state &s) const;
 
+    
+    double evaluate_position(Cathedral_state &s) const;
 
+    Cathedral_move *pickRandomMove(Cathedral_state &s) const;
 
-};
+    //static so same across all states
+    static default_random_engine generator;
+
+    bool any_actions_to_try() const;
+
+    vector<Cathedral_move> movesVec; 
+
+    //**
+    // Territory is check each time a play_move is triggered in cathedral_state
+    // */
+
+    //not nested due to instance stuff needing decleration im scared of it being a derived class increased complexity 
+    //not its own as i need to pass so many private variables 
+
+    void processTerritory(const Cathedral_move& move);
+    
+    std::vector<std::pair<int,int>> getValidPositionsAroundShape(const Cathedral_move& move);
+    bool isValidTerritoryPosition(int row, int col, std::vector<std::vector<bool>>& visited, int& enclosedPieceCount);
+    int convertToTerritoryAndGetCapturedPiece(int row, int col);
+    void addShapeToPlayerShapes(int pieceNum);
+    };

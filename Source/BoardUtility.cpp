@@ -22,62 +22,55 @@ using namespace std;
 
 
 
-std::vector<std::pair<int, int>> BoardUtility::positionsAroundShape(const std::vector<std::vector<int>>& shape) {
+std::vector<std::pair<int, int>> BoardUtility::positionsAroundShape(const Cathedral_move* move) {
     std::vector<std::pair<int, int>> positions;
-    // Find the topmost and leftmost square in the shape matrix
-    int topmostX = -1, topmostY = -1;
+    const auto& shape = move->shape;
+    int baseRow = move->row;
+    int baseCol = move->col;
+
     for (int i = 0; i < shape.size(); ++i) {
         for (int j = 0; j < shape[i].size(); ++j) {
             if (shape[i][j] != 0) {
-                topmostX = j;
-                topmostY = i;
-                break;
-            }
-        }
-        if (topmostX != -1 && topmostY != -1) {
-            break;
-        }
-    }
+                int boardRow = baseRow + i;
+                int boardCol = baseCol + j;
 
-    if (topmostX == -1 || topmostY == -1) {
-        // Shape matrix is empty or invalid
-        return positions;
-    }
-
-    // Compute positions around the shape
-   for (int i = 0; i < shape.size(); ++i) {
-        for (int j = 0; j < shape[i].size(); ++j) {
-            if (shape[i][j] != 0) {
-
+                // Up
                 if (i == 0 || shape[i - 1][j] == 0) {
-                    positions.push_back({i - topmostY - 1, j - topmostX});
+                    positions.push_back({boardRow - 1, boardCol});
                 }
+                // Down
                 if (i == shape.size() - 1 || shape[i + 1][j] == 0) {
-                    positions.push_back({i - topmostY + 1, j - topmostX});
+                    positions.push_back({boardRow + 1, boardCol});
                 }
+                // Left
                 if (j == 0 || shape[i][j - 1] == 0) {
-                    positions.push_back({i - topmostY, j - topmostX - 1});
+                    positions.push_back({boardRow, boardCol - 1});
                 }
+                // Right
                 if (j == shape[i].size() - 1 || shape[i][j + 1] == 0) {
-                    positions.push_back({i - topmostY, j - topmostX + 1});
+                    positions.push_back({boardRow, boardCol + 1});
                 }
-                
-
             }
         }
     }
 
+    // Remove duplicates
+    std::unordered_set<std::pair<int, int>, boost::hash<std::pair<int, int>>> uniquePositions(positions.begin(), positions.end());
+    positions.assign(uniquePositions.begin(), uniquePositions.end());
+    for (const auto& pos : positions) {
+        std::cout << "Position: (" << pos.first << ", " << pos.second << ")" << std::endl;
+    }
     return positions;
 }
 
-
+//unused? 
 bool BoardUtility::checkPositionForPieceRemoval(int x, int y, std::vector<std::vector<bool>>& visited, int& pieceInside) {
     // Check bounds
     if (y < 0 || y >= rows || x < 0 || x >= cols) {
         return true; // Reached the edge, valid
     }
 
-      // If already visited, skip this cell
+    // If already visited, skip this cell
     if (visited[y][x]) {
         return true;
     }
@@ -85,32 +78,25 @@ bool BoardUtility::checkPositionForPieceRemoval(int x, int y, std::vector<std::v
     // Mark the cell as visited
     visited[y][x] = true;
 
-    if (_board[y][x] >= _playerMin && _board[y][x] <= _playerMax) {
+    int cellValue = _board[y][x];
+
+    // If it's a player piece, it's valid
+    if (cellValue >= _playerMin && cellValue <= _playerMax) {
         return true;
     }
 
-
-    if ((_board[y][x] >= _opponentMin && _board[y][x] <= _opponentMax) || _board[y][x] == cathedral) {
-            
-        if (pieceInside == INT_MAX || _board[y][x] == pieceInside ) {
-            pieceInside = _board[y][x];
-            piecePosToRemove.push_back(std::make_pair(y, x));
-            // cout << "pushing back y(row)  " << y << " x(col) " << x << endl;
+    // If it's an opponent piece or cathedral, track it
+    if ((cellValue >= _opponentMin && cellValue <= _opponentMax) || cellValue == cathedral) {
+        if (pieceInside == INT_MAX || cellValue == pieceInside) {
+            pieceInside = cellValue;
+            piecePosToRemove.push_back({y, x});
+        } else {
+            return false; // Multiple different piece types
         }
-        else {
-            // cout <<"returning false " << piecePosToRemove.size() << " pieceInside " << pieceInside << " _board[y][x] " << _board[y][x] << endl;
-            return false; 
-        }
-
-       
     }
-   
 
-
-    if (_board[y][x] == 0 || _board[y][x] == cathedral || (_board[y][x] >= _opponentMin && _board[y][x] <= _opponentMax)) {
-        
-
-        // Check all adjacent cells (including diagonals)
+    // Continue flood fill for empty spaces or opponent territory
+    if (cellValue == 0 || cellValue == _opponentTerritory) {
         bool valid = true;
         valid &= checkPositionForPieceRemoval(x + 1, y, visited, pieceInside); // Right
         if (!valid) return false;
@@ -119,17 +105,6 @@ bool BoardUtility::checkPositionForPieceRemoval(int x, int y, std::vector<std::v
         valid &= checkPositionForPieceRemoval(x, y + 1, visited, pieceInside); // Down
         if (!valid) return false;
         valid &= checkPositionForPieceRemoval(x, y - 1, visited, pieceInside); // Up
-        if (!valid) return false;
-        valid &= checkPositionForPieceRemoval(x + 1, y + 1, visited, pieceInside); // Bottom-Right (Diagonal)
-        if (!valid) return false;
-        valid &= checkPositionForPieceRemoval(x - 1, y - 1, visited, pieceInside); // Top-Left (Diagonal)
-        if (!valid) return false;
-        valid &= checkPositionForPieceRemoval(x + 1, y - 1, visited, pieceInside); // Top-Right (Diagonal)
-        if (!valid) return false;
-        valid &= checkPositionForPieceRemoval(x - 1, y + 1, visited, pieceInside); // Bottom-Left (Diagonal)
-        if (!valid) return false;
-
-
         return valid;
     }
 
@@ -138,10 +113,7 @@ bool BoardUtility::checkPositionForPieceRemoval(int x, int y, std::vector<std::v
 
 
 
-
-
-
-
+//unused ? 
 bool BoardUtility::checkNotOpponentsTerritory(std::vector<std::vector<int>> board, const sf::Vector2f& mousePosWorld) {
     bool valid = true;
     _board = board; 
@@ -163,18 +135,18 @@ bool BoardUtility::checkNotOpponentsTerritory(std::vector<std::vector<int>> boar
 }
 
 
-
+//unsused?
 bool BoardUtility::checkPosition(int x, int y, std::vector<std::vector<bool>>& visited) {
     // Check bounds
     if (y < 0 || y >= rows || x < 0 || x >= cols) {
         return true; // Reached the edge, valid
     }
-    //this is like if you found yourself or the cathedral you know your not in someone elses territory 
+    //if you found yourself or the cathedral you know your not in someone elses territory 
     if (_board[y][x] >= _playerMin && _board[y][x] <= _playerMax || _board[y][x] == cathedral) {
         // cout << "At " << x << ", " << y << ", board value: " << _board[y][x] << " - false" << endl;
         return false;
     }
-
+    //If opponent piece
     if (_board[y][x] >= _opponentMin && _board[y][x] <= _opponentMax) {
         return true;
     }
@@ -216,7 +188,7 @@ void BoardUtility::setTerritoryInfo(int playerTerritory, int opponentTerritory) 
 }
 
 bool BoardUtility::checkIfCreatingTerritory(const Cathedral_move *move) {
-    vector<pair<int,int>> positionsToCheck = positionsAroundShape(move->shape);
+    vector<pair<int,int>> boardPositionsToCheck = positionsAroundShape(move);
 
     // Clear previous flood fills if in step-by-step mode
     if (stepByStepMode) {
@@ -224,14 +196,16 @@ bool BoardUtility::checkIfCreatingTerritory(const Cathedral_move *move) {
         currentFloodFillIndex = 0;
     }
 
-    for (auto pos : positionsToCheck){
-        int boardRow = move->row + pos.first; 
-        int boardCol = move->col + pos.second; 
+    for (auto pos : boardPositionsToCheck){
+        int boardRow = pos.first; 
+        int boardCol = pos.second; 
 
+        // Check inside board bounds
         if(boardCol < 0 || boardCol >= _board[0].size() || boardRow < 0 || boardRow >= _board.size()){
             continue; 
         }
 
+        //check if player piece
         if(_board[boardRow][boardCol] >= _playerMin && _board[boardRow][boardCol] <= _playerMax){
             continue; 
         }
@@ -268,6 +242,7 @@ bool BoardUtility::checkIfCreatingTerritory(const Cathedral_move *move) {
 }
 
 bool BoardUtility::checkIfPositionIsNowPlayersTerritory(int row, int col, std::vector<std::vector<bool>>& visited, int& enclosedPieceCount){
+
     // Check bounds - board edges count as valid enclosure
     if (row < 0 || row >= _board.size() || col < 0 || col >= _board[0].size()) { 
         return true;
@@ -344,8 +319,7 @@ void BoardUtility::changeSpaceToPlayersTerritory(int row, int col){
     }
     
     int cellValue = _board[row][col];
-    
-    // Only mark empty spaces, opponent territory, or pieces marked for removal
+
     if (cellValue != 0 && cellValue != pieceNumToRemove && cellValue != _opponentTerritory) { 
         return;
     }
@@ -370,8 +344,8 @@ void BoardUtility::drawVisitedPositions() {
     if (stepByStepMode && currentFloodFillIndex < allFloodFills.size()) {
         // Draw only the current flood fill
         const auto& currentFloodFill = allFloodFills[currentFloodFillIndex];
-        std::cout << "Drawing flood fill " << (currentFloodFillIndex + 1) << "/" << allFloodFills.size() 
-                  << " with " << currentFloodFill.size() << " positions" << std::endl;
+        // std::cout << "Drawing flood fill " << (currentFloodFillIndex + 1) << "/" << allFloodFills.size() 
+        //           << " with " << currentFloodFill.size() << " positions" << std::endl;
         
         for (const auto& pos : currentFloodFill) {
             int gridX = pos.second + minCol;

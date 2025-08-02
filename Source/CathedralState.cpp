@@ -2,13 +2,15 @@
 #include "Headers/Global.h"
 #include "Headers/CathedralState.h"
 #include "Headers/MatrixUtility.h"
-#include "Headers/BoardUtility.h"
 
 #include <vector>
 #include <iostream>
 #include <utility>
 #include <climits>
 #include <random>
+#include <unordered_set>
+#include <boost/functional/hash.hpp>
+
 
 default_random_engine Cathedral_state::generator = default_random_engine(time(NULL));
 
@@ -324,24 +326,10 @@ bool Cathedral_state::play_move(const Cathedral_move *move){
     else {
         cout << "Error with turn in play move " << endl;
     }
-        // Use BoardUtility for territory checking
-        BoardUtility boardUtil(turn , board);
-        bool territoryCreated = false;
-        if (player1Shapes.size() < shapeFullListPOne.size() - 1 || player2Shapes.size() < shapeFullListPTwo.size() - 1){
-            boardUtil.setTerritoryInfo(playerTerritory, opponentTerritory);
-            territoryCreated = boardUtil.checkIfCreatingTerritory(move);
-        }
-        
-        if (territoryCreated) {
-            // Get the updated board from BoardUtility
-            board = boardUtil.getBoard();
-            
-            // Handle piece removal if needed
-            int pieceToRemove = boardUtil.getPieceNumToRemove();
-            if (pieceToRemove != -1 && pieceToRemove != 1) {
-                addShapeToPlayerShapes(pieceToRemove);
-            }
-        }
+        // Territory shoud
+    if (player1Shapes.size() < shapeFullListPOne.size() - 1 || player2Shapes.size() < shapeFullListPTwo.size() - 1){
+        processTerritory(*move);
+    }
 
         winner = check_winner();
         change_turn();
@@ -564,50 +552,276 @@ Cathedral_move *Cathedral_state::pick_semirandom_move(Cathedral_state &s) const{
 }
 
 
-void Cathedral_state::addShapeToPlayerShapes(int pieceNum){
-    int i = 0;
-    if(turn == 2){
-        for (const auto& shape : shapeFullListPOne) {
-            if(shape.empty()){
-                return;
-            }
-            if(shape[0][0] == pieceNum || shape[0][1] == pieceNum){
-                if(player1Shapes.size() >= i){
-                    player1Shapes.insert(player1Shapes.begin() + i, shape);
-                }else {
-                    player1Shapes.push_back(shape);
-                }
-            
-                return; 
-            }
-            i++;
-        }
-    }
-    else if(turn == 1){
-          for (const auto& shape : shapeFullListPTwo) {
-            if(shape.empty()){
-                return;
-            }
-            if(shape[0][0] == pieceNum || shape[0][1] == pieceNum){
-                if(player2Shapes.size() >= i){
-                    player2Shapes.insert(player2Shapes.begin() + i, shape);
-                }else {
-                    player2Shapes.push_back(shape);
-                }
-            
-                return; 
-            }
-            i++;
-        }
-    }
-
-     cout << "Invalid pieceNum or turn when trying to add shape to player shapes" << endl;
-     return;
-}
-
-
-
 void Cathedral_state::addMove(Cathedral_move m){
     movesVec.push_back(m);
 }
+
+
+
+void Cathedral_state::processTerritory(const Cathedral_move& move){
+    std::vector<std::pair<int,int>> boardPositionsAroundShape = getValidPositionsAroundShape(move); //might need to remove positions outside board. no need to check them anyway
     
+    for (int i = 0; i<boardPositionsAroundShape.size(); i++){
+        int boardRow = boardPositionsAroundShape[i].first;
+        int boardCol = boardPositionsAroundShape[i].second;
+        std::vector<std::vector<bool>> visited(board.size(), std::vector<bool>(board[0].size(), false));
+        int enclosedPieceNum = -1;
+        bool isTerritory = isValidTerritoryPosition(boardRow, boardCol, visited, enclosedPieceNum);
+        if(isTerritory){ 
+            std::cout << "Converting to territory at boardRow: " << boardRow << ", boardCol: " << boardCol << std::endl;
+
+           int removedPieceNum = convertToTerritoryAndGetCapturedPiece(boardRow, boardCol);
+           addShapeToPlayerShapes(removedPieceNum);
+        }
+
+        
+    }
+}
+    
+std::vector<std::pair<int,int>> Cathedral_state::getValidPositionsAroundShape(const Cathedral_move& move){
+     std::vector<std::pair<int, int>> positions;
+    const auto& shape = move.shape;
+    const int baseRow = move.row;
+    const int baseCol = move.col;
+
+    for (int i = 0; i < shape.size(); ++i) {
+        for (int j = 0; j < shape[i].size(); ++j) {
+            if (shape[i][j] != 0) {
+                int boardRow = baseRow + i;
+                int boardCol = baseCol + j;
+
+                // Up
+                if ((i == 0 || shape[i - 1][j] == 0) &&
+                    boardRow - 1 >= 0 && boardRow - 1 < board.size() &&
+                    boardCol >= 0 && boardCol < board[0].size() &&
+                    (board[boardRow - 1][boardCol] == 0 || 
+                     board[boardRow - 1][boardCol] == cathedral || 
+                     (board[boardRow - 1][boardCol] >= opponentMin && board[boardRow - 1][boardCol] <= opponentMax))) {
+                    positions.push_back({boardRow - 1, boardCol});
+                }
+                // Down
+                if ((i == shape.size() - 1 || shape[i + 1][j] == 0) &&
+                    boardRow + 1 >= 0 && boardRow + 1 < board.size() &&
+                    boardCol >= 0 && boardCol < board[0].size() &&
+                    (board[boardRow + 1][boardCol] == 0 || 
+                     board[boardRow + 1][boardCol] == cathedral || 
+                     (board[boardRow + 1][boardCol] >= opponentMin && board[boardRow + 1][boardCol] <= opponentMax))) {
+                    positions.push_back({boardRow + 1, boardCol});
+                }
+
+                // Left
+                if ((j == 0 || shape[i][j - 1] == 0) &&
+                    boardRow >= 0 && boardRow < board.size() &&
+                    boardCol - 1 >= 0 && boardCol - 1 < board[0].size() &&
+                    (board[boardRow][boardCol - 1] == 0 || 
+                     board[boardRow][boardCol - 1] == cathedral || 
+                     (board[boardRow][boardCol - 1] >= opponentMin && board[boardRow][boardCol - 1] <= opponentMax))) {
+                    positions.push_back({boardRow, boardCol - 1});
+                }
+
+                // Right
+                if ((j == shape[i].size() - 1 || shape[i][j + 1] == 0) &&
+                    boardRow >= 0 && boardRow < board.size() &&
+                    boardCol + 1 >= 0 && boardCol + 1 < board[0].size() &&
+                    (board[boardRow][boardCol + 1] == 0 || 
+                     board[boardRow][boardCol + 1] == cathedral || 
+                     (board[boardRow][boardCol + 1] >= opponentMin && board[boardRow][boardCol + 1] <= opponentMax))) {
+                    positions.push_back({boardRow, boardCol + 1});
+                }
+            }
+        }
+    }
+
+    // Remove duplicates
+    std::unordered_set<std::pair<int, int>, boost::hash<std::pair<int, int>>> uniquePositions(positions.begin(), positions.end());
+    positions.assign(uniquePositions.begin(), uniquePositions.end());
+    return positions;
+}
+    
+bool Cathedral_state::isValidTerritoryPosition(int row, int col, std::vector<std::vector<bool>>& visited, int& enclosedPieceNum){
+
+    // Check bounds - board edges count as valid enclosure
+    if (row < 0 || row >= board.size() || col < 0 || col >= board[0].size()) { 
+        return true;
+    }
+
+    // If already visited, skip this cell
+    if (visited[row][col]) { 
+        return true;
+    }
+
+    // Mark the cell as visited
+    visited[row][col] = true;
+    
+    int cellValue = board[row][col];
+
+    // If it's player's own piece or territory, this forms valid enclosure
+    if (cellValue >= playerMin && cellValue <= playerMax || cellValue == playerTerritory) {
+        return true;
+    }
+
+    // If it's an opponent piece or cathedral that can be captured
+    if ((cellValue >= opponentMin && cellValue <= opponentMax) || cellValue == cathedral) {  
+        if (enclosedPieceNum != -1 && enclosedPieceNum != cellValue){
+            // std::cout << "Encountered second opponent piece or cathedral at (" << row << ", " << col << ") with value: " << cellValue << std::endl;
+            return false; 
+        }
+        else {
+            enclosedPieceNum = cellValue; 
+        }
+    }
+
+    // For empty spaces, pieces marked for removal, continue flood fill
+    if (cellValue == 0 || cellValue == cathedral || 
+        (cellValue >= opponentMin && cellValue <= opponentMax)) { 
+        
+        // Check all 8 adjacent cells (including diagonals)
+        bool valid = true;
+        valid &= isValidTerritoryPosition(row, col + 1, visited, enclosedPieceNum); // Right
+        if (!valid) return false;
+        valid &= isValidTerritoryPosition(row, col - 1, visited, enclosedPieceNum); // Left
+        if (!valid) return false;
+        valid &= isValidTerritoryPosition(row + 1, col, visited, enclosedPieceNum); // Down
+        if (!valid) return false;
+        valid &= isValidTerritoryPosition(row - 1, col, visited, enclosedPieceNum); // Up
+        if (!valid) return false;
+        valid &= isValidTerritoryPosition(row + 1, col + 1, visited, enclosedPieceNum); // Bottom-Right
+        if (!valid) return false;
+        valid &= isValidTerritoryPosition(row - 1, col - 1, visited, enclosedPieceNum); // Top-Left
+        if (!valid) return false;
+        valid &= isValidTerritoryPosition(row + 1, col - 1, visited, enclosedPieceNum); // Bottom-Left
+        if (!valid) return false;
+        valid &= isValidTerritoryPosition(row - 1, col + 1, visited, enclosedPieceNum); // Top-Right
+        if (!valid) return false;
+
+        return valid;
+    }
+
+    return false;
+}
+
+    //return -1 if no piece to remove
+int Cathedral_state::convertToTerritoryAndGetCapturedPiece(int row, int col){
+    if (row < 0 || row >= board.size() || col < 0 || col >= board[0].size()) {
+        return -1; // Out of bounds
+    }
+
+    std::vector<std::vector<bool>> visited(board.size(), std::vector<bool>(board[0].size(), false));
+    std::queue<std::pair<int, int>> toVisit;
+    toVisit.push({row, col});
+
+    int capturedPieceNum = -1;
+
+    while (!toVisit.empty()) {
+        auto [currentRow, currentCol] = toVisit.front();
+        toVisit.pop();
+
+        // Skip if already visited
+        if (visited[currentRow][currentCol]) {
+            continue;
+        }
+        visited[currentRow][currentCol] = true;
+
+        int cellValue = board[currentRow][currentCol];
+
+        // If it's an opponent piece or cathedral, capture it
+        if ((cellValue >= opponentMin && cellValue <= opponentMax) || cellValue == cathedral) {
+            if (capturedPieceNum != -1 && capturedPieceNum != cellValue){
+                return false; 
+            }
+            else {
+                capturedPieceNum = cellValue; 
+            }
+        }
+
+        // Convert the cell to playerTerritory
+        board[currentRow][currentCol] = playerTerritory;
+
+        // Add adjacent cells to the queue if they are valid for conversion
+        std::vector<std::pair<int, int>> directions = {
+            {0, 1}, {1, 0}, {0, -1}, {-1, 0}, // Cardinal directions
+            {1, 1}, {-1, -1}, {1, -1}, {-1, 1} // Diagonals
+        };
+
+        for (const auto& [dRow, dCol] : directions) {
+            int newRow = currentRow + dRow;
+            int newCol = currentCol + dCol;
+
+            if (newRow >= 0 && newRow < board.size() && newCol >= 0 && newCol < board[0].size() &&
+                !visited[newRow][newCol]) {
+                int newCellValue = board[newRow][newCol];
+
+                // Only add cells that are empty, opponent pieces, cathedral, or opponent territory
+                if (newCellValue == 0 || newCellValue == cathedral ||
+                    (newCellValue >= opponentMin && newCellValue <= opponentMax)) {
+                    toVisit.push({newRow, newCol});
+                }
+
+                if (newCellValue == opponentTerritory ){
+                    std::cout << "something wrong converting territory opponent territory found" << std::endl;
+                }
+            }
+        }
+    }
+
+    return capturedPieceNum;
+}
+
+
+void Cathedral_state::addShapeToPlayerShapes(int pieceNum) {
+    if (pieceNum == cathedral || pieceNum == -1 ){return;}
+    const auto& shapeList = (turn == 2) ? shapeFullListPOne : shapeFullListPTwo;
+    auto& playerShapes = (turn == 2) ? player1Shapes : player2Shapes;
+
+    for (const auto& shape : shapeList) {
+        if (!shape.empty() && (shape[0][0] == pieceNum || (shape[0].size() > 1 && shape[0][1] == pieceNum))) {
+            playerShapes.push_back(shape);
+            return;
+        }
+    }
+
+    std::cout << "Invalid pieceNum" << pieceNum << " or turn when trying to add shape to player shapes" << std::endl;
+}
+
+//old unsure if i want the insert at same place bit other wise shit 
+
+// void Cathedral_state::addShapeToPlayerShapes(int pieceNum){
+//     int i = 0;
+//     if(turn == 2){
+//         for (const auto& shape : shapeFullListPOne) {
+//             if(shape.empty()){
+//                 return;
+//             }
+//             if(shape[0][0] == pieceNum || shape[0][1] == pieceNum){
+//                 if(player1Shapes.size() >= i){
+//                     player1Shapes.insert(player1Shapes.begin() + i, shape);
+//                 }else {
+//                     player1Shapes.push_back(shape);
+//                 }
+            
+//                 return; 
+//             }
+//             i++;
+//         }
+//     }
+//     else if(turn == 1){
+//           for (const auto& shape : shapeFullListPTwo) {
+//             if(shape.empty()){
+//                 return;
+//             }
+//             if(shape[0][0] == pieceNum || shape[0][1] == pieceNum){
+//                 if(player2Shapes.size() >= i){
+//                     player2Shapes.insert(player2Shapes.begin() + i, shape);
+//                 }else {
+//                     player2Shapes.push_back(shape);
+//                 }
+            
+//                 return; 
+//             }
+//             i++;
+//         }
+//     }
+
+//      cout << "Invalid pieceNum or turn when trying to add shape to player shapes" << endl;
+//      return;
+// }

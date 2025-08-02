@@ -81,7 +81,7 @@ class BoardUtility{
         std::vector<std::vector<std::pair<int, int>>> allFloodFills; // Each flood fill's visited positions
         int currentFloodFillIndex = 0;
 
-        std::vector<std::pair<int, int>> positionsAroundShape(const std::vector<std::vector<int>>& shape);
+        std::vector<std::pair<int, int>> positionsAroundShape(const Cathedral_move* move);
 
         //checking placement not in enemy territory 
         bool checkPosition(int x, int y,std::vector<std::vector<bool>>& visited); //recursive function 
